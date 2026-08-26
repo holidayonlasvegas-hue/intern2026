@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
+
+    <title>Chi tiết tên miền - VNNIC DNS Manager</title>
+
+    <link th:href="@{/vendor/fontawesome-free/css/all.min.css}"
+          rel="stylesheet">
+
+    <link th:href="@{/css/sb-admin-2.min.css}"
+          rel="stylesheet">
+
+</head>
+
+
+<body id="page-top">
+
+
+<div id="wrapper">
+
+
+    <!-- ================================================= -->
+    <!-- SIDEBAR -->
+    <!-- ================================================= -->
+
+    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion"
+        id="accordionSidebar">
+
+
+        <a class="sidebar-brand d-flex align-items-center justify-content-center"
+           th:href="@{/}">
+
+            <div class="sidebar-brand-icon">
+                <i class="fas fa-network-wired"></i>
+            </div>
+
+            <div class="sidebar-brand-text mx-3">
+                VNNIC DNS
+            </div>
+
+        </a>
+
+
+        <hr class="sidebar-divider my-0">
+
+
+        <li class="nav-item">
+
+            <a class="nav-link"
+               th:href="@{/}">
+
+                <i class="fas fa-fw fa-tachometer-alt"></i>
+
+                <span>Dashboard</span>
+
+            </a>
+
+        </li>
+
+
+        <hr class="sidebar-divider">
+
+
+        <div class="sidebar-heading">
+            Quản lý
+        </div>
+
+
+        <li class="nav-item active">
+
+            <a class="nav-link"
+               th:href="@{/domains}">
+
+                <i class="fas fa-fw fa-globe"></i>
+
+                <span>Tên miền</span>
+
+            </a>
+
+        </li>
+
+
+        <li class="nav-item">
+
+            <a class="nav-link"
+               th:href="@{/records}">
+
+                <i class="fas fa-fw fa-server"></i>
+
+                <span>Bản ghi DNS</span>
+
+            </a>
+
+        </li>
+
+
+        <hr class="sidebar-divider">
+
+
+        <li class="nav-item">
+
+            <a class="nav-link"
+               th:href="@{/history}">
+
+                <i class="fas fa-fw fa-history"></i>
+
+                <span>Lịch sử thay đổi</span>
+
+            </a>
+
+        </li>
+
+
+        <hr class="sidebar-divider d-none d-md-block">
+
+
+        <div class="text-center d-none d-md-inline">
+
+            <button class="rounded-circle border-0"
+                    id="sidebarToggle">
+            </button>
+
+        </div>
+
+
+    </ul>
+
+
+    <!-- ================================================= -->
+    <!-- CONTENT -->
+    <!-- ================================================= -->
+
+    <div id="content-wrapper"
+         class="d-flex flex-column">
+
+
+        <div id="content">
+
+
+            <!-- TOPBAR -->
+
+            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+
+                <button id="sidebarToggleTop"
+                        class="btn btn-link d-md-none rounded-circle mr-3">
+
+                    <i class="fa fa-bars"></i>
+
+                </button>
+
+
+                <span class="font-weight-bold text-gray-800">
+
+                    Hệ thống quản lý tên miền và DNS
+
+                </span>
+
+
+            </nav>
+
+
+            <!-- PAGE -->
+
+            <div class="container-fluid">
+
+
+                <!-- BACK -->
+
+                <div class="mb-3">
+
+                    <a th:href="@{/domains}"
+                       class="btn btn-light btn-sm">
+
+                        <i class="fas fa-arrow-left mr-1"></i>
+
+                        Quay lại danh sách tên miền
+
+                    </a>
+
+                </div>
+
+
+                <!-- TITLE -->
+
+                <div class="d-sm-flex align-items-center justify-content-between mb-4">
+
+
+                    <div>
+
+                        <h1 class="h3 mb-1 text-gray-800"
+                            th:text="${domain.domainName}">
+
+                            example.vn
+
+                        </h1>
+
+
+                        <span class="badge"
+                              th:classappend="${domain.status == 'ACTIVE'}
+                                    ? ' badge-success'
+                                    : (${domain.status == 'INACTIVE'}
+                                        ? ' badge-secondary'
+                                        : ' badge-danger')"
+                              th:text="${domain.status}">
+
+                            ACTIVE
+
+                        </span>
+
+                    </div>
+
+
+                    <button th:if="${domain.status != 'DELETED'}"
+                            type="button"
+                            class="btn btn-warning shadow-sm"
+                            data-toggle="modal"
+                            data-target="#editDomainModal">
+
+                        <i class="fas fa-edit mr-1"></i>
+
+                        Chỉnh sửa
+
+                    </button>
+
+
+                </div>
+
+
+                <!-- ================================================= -->
+                <!-- SUCCESS -->
+                <!-- ================================================= -->
+
+                <div th:if="${successMessage != null}"
+                     class="alert alert-success alert-dismissible fade show"
+                     role="alert">
+
+                    <i class="fas fa-check-circle mr-2"></i>
+
+                    <span th:text="${successMessage}"></span>
+
+                    <button type="button"
+                            class="close"
+                            data-dismiss="alert">
+
+                        <span>&times;</span>
+
+                    </button>
+
+                </div>
+
+
+                <!-- ================================================= -->
+                <!-- ERROR -->
+                <!-- ================================================= -->
+
+                <div th:if="${errorMessage != null}"
+                     class="alert alert-danger alert-dismissible fade show"
+                     role="alert">
+
+                    <i class="fas fa-exclamation-triangle mr-2"></i>
+
+                    <span th:text="${errorMessage}"></span>
+
+                    <button type="button"
+                            class="close"
+                            data-dismiss="alert">
+
+                        <span>&times;</span>
+
+                    </button>
+
+                </div>
+
+
+                <div class="row">
+
+
+                    <!-- ================================================= -->
+                    <!-- DOMAIN INFORMATION -->
+                    <!-- ================================================= -->
+
+                    <div class="col-lg-8">
+
+
+                        <div class="card shadow mb-4">
+
+
+                            <div class="card-header py-3">
+
+                                <h6 class="m-0 font-weight-bold text-primary">
+
+                                    Thông tin tên miền
+
+                                </h6>
+
+                            </div>
+
+
+                            <div class="card-body">
+
+
+                                <dl class="row mb-0">
+
+
+                                    <dt class="col-sm-4 mb-3">
+                                        ID
+                                    </dt>
+
+                                    <dd class="col-sm-8 mb-3"
+                                        th:text="${domain.id}">
+                                        1
+                                    </dd>
+
+
+                                    <dt class="col-sm-4 mb-3">
+                                        Tên miền
+                                    </dt>
+
+                                    <dd class="col-sm-8 mb-3">
+
+                                        <code th:text="${domain.domainName}">
+                                            example.vn
+                                        </code>
+
+                                    </dd>
+
+
+                                    <dt class="col-sm-4 mb-3">
+                                        Mô tả
+                                    </dt>
+
+                                    <dd class="col-sm-8 mb-3"
+                                        th:text="${domain.description != null
+                                            && !domain.description.isBlank()
+                                            ? domain.description
+                                            : '-'}">
+
+                                        -
+
+                                    </dd>
+
+
+                                    <dt class="col-sm-4 mb-3">
+                                        Trạng thái
+                                    </dt>
+
+                                    <dd class="col-sm-8 mb-3">
+
+                                        <span class="badge"
+                                              th:classappend="${domain.status == 'ACTIVE'}
+                                                    ? ' badge-success'
+                                                    : (${domain.status == 'INACTIVE'}
+                                                        ? ' badge-secondary'
+                                                        : ' badge-danger')"
+                                              th:text="${domain.status}">
+
+                                            ACTIVE
+
+                                        </span>
+
+                                    </dd>
+
+
+                                    <dt class="col-sm-4 mb-3">
+                                        Ngày tạo
+                                    </dt>
+
+                                    <dd class="col-sm-8 mb-3"
+                                        th:text="${domain.createdAt != null
+                                            ? #temporals.format(
+                                                domain.createdAt,
+                                                'dd/MM/yyyy HH:mm:ss'
+                                              )
+                                            : '-'}">
+
+                                        -
+
+                                    </dd>
+
+
+                                    <dt class="col-sm-4 mb-3">
+                                        Cập nhật gần nhất
+                                    </dt>
+
+                                    <dd class="col-sm-8 mb-3"
+                                        th:text="${domain.updatedAt != null
+                                            ? #temporals.format(
+                                                domain.updatedAt,
+                                                'dd/MM/yyyy HH:mm:ss'
+                                              )
+                                            : '-'}">
+
+                                        -
+
+                                    </dd>
+
+
+                                    <th:block th:if="${domain.status == 'DELETED'}">
+
+
+                                        <dt class="col-sm-4 mb-3 text-danger">
+                                            Thời gian xóa mềm
+                                        </dt>
+
+                                        <dd class="col-sm-8 mb-3 text-danger"
+                                            th:text="${domain.deletedAt != null
+                                                ? #temporals.format(
+                                                    domain.deletedAt,
+                                                    'dd/MM/yyyy HH:mm:ss'
+                                                  )
+                                                : '-'}">
+
+                                            -
+
+                                        </dd>
+
+
+                                    </th:block>
+
+
+                                </dl>
+
+
+                            </div>
+
+
+                        </div>
+
+
+                    </div>
+
+
+                    <!-- ================================================= -->
+                    <!-- RIGHT -->
+                    <!-- ================================================= -->
+
+                    <div class="col-lg-4">
+
+
+                        <!-- RECORD COUNT -->
+
+                        <div class="card border-left-info shadow mb-4">
+
+                            <div class="card-body">
+
+                                <div class="row no-gutters align-items-center">
+
+
+                                    <div class="col mr-2">
+
+                                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+
+                                            DNS Record ACTIVE
+
+                                        </div>
+
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800"
+                                             th:text="${recordCount}">
+
+                                            0
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="col-auto">
+
+                                        <i class="fas fa-server fa-2x text-gray-300"></i>
+
+                                    </div>
+
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- QUICK LINK -->
+
+                        <div class="card shadow mb-4">
+
+
+                            <div class="card-header py-3">
+
+                                <h6 class="m-0 font-weight-bold text-primary">
+
+                                    DNS Record
+
+                                </h6>
+
+                            </div>
+
+
+                            <div class="card-body">
+
+                                <a th:href="@{/records(domainId=${domain.id})}"
+                                   class="btn btn-info btn-block">
+
+                                    <i class="fas fa-server mr-1"></i>
+
+                                    Xem DNS Record
+
+                                </a>
+
+
+                                <a th:href="@{/history(domainId=${domain.id})}"
+                                   class="btn btn-light btn-block">
+
+                                    <i class="fas fa-history mr-1"></i>
+
+                                    Xem lịch sử
+
+                                </a>
+
+                            </div>
+
+
+                        </div>
+
+
+                        <!-- ================================================= -->
+                        <!-- ACTIONS -->
+                        <!-- ================================================= -->
+
+                        <div class="card shadow mb-4">
+
+
+                            <div class="card-header py-3">
+
+                                <h6 class="m-0 font-weight-bold text-primary">
+
+                                    Thao tác
+
+                                </h6>
+
+                            </div>
+
+
+                            <div class="card-body">
+
+
+                                <!-- ACTIVE -->
+
+                                <div th:if="${domain.status == 'ACTIVE'}">
+
+
+                                    <button type="button"
+                                            class="btn btn-warning btn-block mb-2"
+                                            data-toggle="modal"
+                                            data-target="#editDomainModal">
+
+                                        <i class="fas fa-edit mr-1"></i>
+
+                                        Cập nhật tên miền
+
+                                    </button>
+
+
+                                    <form th:action="@{/domains/{id}/deactivate(id=${domain.id})}"
+                                          method="post">
+
+                                        <button type="submit"
+                                                class="btn btn-secondary btn-block mb-2"
+                                                onclick="return confirm('Chuyển tên miền sang INACTIVE?');">
+
+                                            <i class="fas fa-pause mr-1"></i>
+
+                                            Ngừng quản lý
+
+                                        </button>
+
+                                    </form>
+
+
+                                    <form th:action="@{/domains/{id}/delete(id=${domain.id})}"
+                                          method="post">
+
+                                        <button type="submit"
+                                                class="btn btn-danger btn-block"
+                                                onclick="return confirm('Tên miền sẽ chuyển sang DELETED. Bạn có chắc chắn không?');">
+
+                                            <i class="fas fa-trash mr-1"></i>
+
+                                            Xóa mềm
+
+                                        </button>
+
+                                    </form>
+
+
+                                </div>
+
+
+                                <!-- INACTIVE -->
+
+                                <div th:if="${domain.status == 'INACTIVE'}">
+
+
+                                    <form th:action="@{/domains/{id}/activate(id=${domain.id})}"
+                                          method="post">
+
+                                        <button type="submit"
+                                                class="btn btn-success btn-block mb-2">
+
+                                            <i class="fas fa-play mr-1"></i>
+
+                                            Kích hoạt lại
+
+                                        </button>
+
+                                    </form>
+
+
+                                    <button type="button"
+                                            class="btn btn-warning btn-block mb-2"
+                                            data-toggle="modal"
+                                            data-target="#editDomainModal">
+
+                                        <i class="fas fa-edit mr-1"></i>
+
+                                        Cập nhật tên miền
+
+                                    </button>
+
+
+                                    <form th:action="@{/domains/{id}/delete(id=${domain.id})}"
+                                          method="post">
+
+                                        <button type="submit"
+                                                class="btn btn-danger btn-block"
+                                                onclick="return confirm('Tên miền sẽ chuyển sang DELETED. Bạn có chắc chắn không?');">
+
+                                            <i class="fas fa-trash mr-1"></i>
+
+                                            Xóa mềm
+
+                                        </button>
+
+                                    </form>
+
+
+                                </div>
+
+
+                                <!-- DELETED -->
+
+                                <div th:if="${domain.status == 'DELETED'}">
+
+
+                                    <div class="alert alert-danger">
+
+                                        <i class="fas fa-trash mr-1"></i>
+
+                                        Tên miền đã bị xóa mềm.
+
+                                    </div>
+
+
+                                    <p class="small text-muted">
+
+                                        Chỉ có thể xóa vĩnh viễn khi không còn DNS Record
+                                        nào tham chiếu tới tên miền này.
+
+                                    </p>
+
+
+                                    <form th:action="@{/domains/{id}/hard-delete(id=${domain.id})}"
+                                          method="post">
+
+                                        <button type="submit"
+                                                class="btn btn-dark btn-block"
+                                                onclick="return confirm('CẢNH BÁO: Tên miền sẽ bị xóa vĩnh viễn khỏi database. Thao tác này không thể hoàn tác. Bạn có chắc chắn không?');">
+
+                                            <i class="fas fa-trash-alt mr-1"></i>
+
+                                            Xóa vĩnh viễn
+
+                                        </button>
+
+                                    </form>
+
+
+                                </div>
+
+
+                            </div>
+
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+        <!-- FOOTER -->
+
+        <footer class="sticky-footer bg-white">
+
+            <div class="container my-auto">
+
+                <div class="copyright text-center my-auto">
+
+                    <span>
+                        VNNIC DNS Management System
+                    </span>
+
+                </div>
+
+            </div>
+
+        </footer>
+
+
+    </div>
+
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- EDIT DOMAIN MODAL -->
+<!-- ===================================================== -->
+
+<div th:if="${domain.status != 'DELETED'}"
+     class="modal fade"
+     id="editDomainModal"
+     tabindex="-1"
+     role="dialog"
+     aria-hidden="true">
+
+
+    <div class="modal-dialog"
+         role="document">
+
+
+        <div class="modal-content">
+
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">
+
+                    Cập nhật tên miền
+
+                </h5>
+
+                <button type="button"
+                        class="close"
+                        data-dismiss="modal">
+
+                    <span>&times;</span>
+
+                </button>
+
+            </div>
+
+
+            <form th:action="@{/domains/{id}/edit(id=${domain.id})}"
+                  method="post">
+
+
+                <div class="modal-body">
+
+
+                    <!-- DOMAIN NAME -->
+
+                    <div class="form-group">
+
+                        <label for="editDomainName">
+
+                            Tên miền
+
+                        </label>
+
+                        <input id="editDomainName"
+                               type="text"
+                               class="form-control"
+                               name="domainName"
+                               th:value="${domain.domainName}"
+                               required>
+
+                    </div>
+
+
+                    <!-- DESCRIPTION -->
+
+                    <div class="form-group">
+
+                        <label for="editDescription">
+
+                            Mô tả
+
+                        </label>
+
+                        <textarea id="editDescription"
+                                  class="form-control"
+                                  name="description"
+                                  rows="3"
+                                  th:text="${domain.description}">
+                        </textarea>
+
+                    </div>
+
+
+                    <!-- STATUS -->
+
+                    <div class="form-group">
+
+                        <label for="editStatus">
+
+                            Trạng thái
+
+                        </label>
+
+                        <select id="editStatus"
+                                class="form-control"
+                                name="status">
+
+                            <option value="ACTIVE"
+                                    th:selected="${domain.status == 'ACTIVE'}">
+
+                                ACTIVE
+
+                            </option>
+
+                            <option value="INACTIVE"
+                                    th:selected="${domain.status == 'INACTIVE'}">
+
+                                INACTIVE
+
+                            </option>
+
+                        </select>
+
+
+                        <small class="form-text text-muted">
+
+                            DELETED chỉ được thực hiện bằng chức năng xóa mềm.
+
+                        </small>
+
+                    </div>
+
+
+                </div>
+
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-dismiss="modal">
+
+                        Hủy
+
+                    </button>
+
+
+                    <button type="submit"
+                            class="btn btn-warning">
+
+                        <i class="fas fa-save mr-1"></i>
+
+                        Cập nhật
+
+                    </button>
+
+                </div>
+
+
+            </form>
+
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+<script th:src="@{/vendor/jquery/jquery.min.js}"></script>
+
+<script th:src="@{/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
+
+<script th:src="@{/vendor/jquery-easing/jquery.easing.min.js}"></script>
+
+<script th:src="@{/js/sb-admin-2.min.js}"></script>
+
+
+</body>
+
+</html>

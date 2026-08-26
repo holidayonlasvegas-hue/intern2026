@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
+
+    <title>Dashboard - VNNIC DNS Manager</title>
+
+    <link th:href="@{/vendor/fontawesome-free/css/all.min.css}"
+          rel="stylesheet">
+
+    <link th:href="@{/css/sb-admin-2.min.css}"
+          rel="stylesheet">
+
+</head>
+
+
+<body id="page-top">
+
+
+<div id="wrapper">
+
+
+    <!-- SIDEBAR -->
+
+    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion"
+        id="accordionSidebar">
+
+
+        <a class="sidebar-brand d-flex align-items-center justify-content-center"
+           th:href="@{/}">
+
+            <div class="sidebar-brand-icon">
+                <i class="fas fa-network-wired"></i>
+            </div>
+
+            <div class="sidebar-brand-text mx-3">
+                VNNIC DNS
+            </div>
+
+        </a>
+
+
+        <hr class="sidebar-divider my-0">
+
+
+        <li class="nav-item active">
+
+            <a class="nav-link"
+               th:href="@{/}">
+
+                <i class="fas fa-fw fa-tachometer-alt"></i>
+
+                <span>Dashboard</span>
+
+            </a>
+
+        </li>
+
+
+        <hr class="sidebar-divider">
+
+
+        <div class="sidebar-heading">
+            Quản lý
+        </div>
+
+
+        <li class="nav-item">
+
+            <a class="nav-link"
+               th:href="@{/domains}">
+
+                <i class="fas fa-fw fa-globe"></i>
+
+                <span>Tên miền</span>
+
+            </a>
+
+        </li>
+
+
+        <li class="nav-item">
+
+            <a class="nav-link"
+               th:href="@{/records}">
+
+                <i class="fas fa-fw fa-server"></i>
+
+                <span>Bản ghi DNS</span>
+
+            </a>
+
+        </li>
+
+
+        <hr class="sidebar-divider">
+
+
+        <li class="nav-item">
+
+            <a class="nav-link"
+               th:href="@{/history}">
+
+                <i class="fas fa-fw fa-history"></i>
+
+                <span>Lịch sử thay đổi</span>
+
+            </a>
+
+        </li>
+
+
+        <hr class="sidebar-divider d-none d-md-block">
+
+
+        <div class="text-center d-none d-md-inline">
+
+            <button class="rounded-circle border-0"
+                    id="sidebarToggle">
+            </button>
+
+        </div>
+
+
+    </ul>
+
+
+    <!-- CONTENT -->
+
+    <div id="content-wrapper"
+         class="d-flex flex-column">
+
+
+        <div id="content">
+
+
+            <!-- TOPBAR -->
+
+            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+
+                <button id="sidebarToggleTop"
+                        class="btn btn-link d-md-none rounded-circle mr-3">
+
+                    <i class="fa fa-bars"></i>
+
+                </button>
+
+
+                <span class="font-weight-bold text-gray-800">
+
+                    Hệ thống quản lý tên miền và DNS
+
+                </span>
+
+
+                <ul class="navbar-nav ml-auto">
+
+                    <div class="topbar-divider d-none d-sm-block"></div>
+
+                    <li class="nav-item">
+
+                        <span class="nav-link">
+
+                            <span class="mr-2 d-none d-lg-inline text-gray-600 small">
+                                VNNIC Admin
+                            </span>
+
+                            <i class="fas fa-user-circle fa-2x text-gray-400"></i>
+
+                        </span>
+
+                    </li>
+
+                </ul>
+
+
+            </nav>
+
+
+            <!-- PAGE -->
+
+            <div class="container-fluid">
+
+
+                <!-- TITLE -->
+
+                <div class="d-sm-flex align-items-center justify-content-between mb-4">
+
+
+                    <div>
+
+                        <h1 class="h3 mb-1 text-gray-800">
+                            Dashboard
+                        </h1>
+
+                        <p class="mb-0 text-gray-600">
+                            Tổng quan hệ thống quản lý tên miền và DNS.
+                        </p>
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- ================================================= -->
+                <!-- STATISTICS -->
+                <!-- ================================================= -->
+
+                <div class="row">
+
+
+                    <!-- TOTAL DOMAIN -->
+
+                    <div class="col-xl-4 col-md-6 mb-4">
+
+                        <div class="card border-left-primary shadow h-100 py-2">
+
+                            <div class="card-body">
+
+
+                                <div class="row no-gutters align-items-center">
+
+
+                                    <div class="col mr-2">
+
+
+                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+
+                                            Tổng tên miền
+
+                                        </div>
+
+
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800"
+                                             th:text="${totalDomains}">
+
+                                            0
+
+                                        </div>
+
+
+                                    </div>
+
+
+                                    <div class="col-auto">
+
+                                        <i class="fas fa-globe fa-2x text-gray-300"></i>
+
+                                    </div>
+
+
+                                </div>
+
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ACTIVE DOMAIN -->
+
+                    <div class="col-xl-4 col-md-6 mb-4">
+
+                        <div class="card border-left-success shadow h-100 py-2">
+
+                            <div class="card-body">
+
+
+                                <div class="row no-gutters align-items-center">
+
+
+                                    <div class="col mr-2">
+
+
+                                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+
+                                            Domain ACTIVE
+
+                                        </div>
+
+
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800"
+                                             th:text="${activeDomains}">
+
+                                            0
+
+                                        </div>
+
+
+                                    </div>
+
+
+                                    <div class="col-auto">
+
+                                        <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+
+                                    </div>
+
+
+                                </div>
+
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- INACTIVE DOMAIN -->
+
+                    <div class="col-xl-4 col-md-6 mb-4">
+
+                        <div class="card border-left-secondary shadow h-100 py-2">
+
+                            <div class="card-body">
+
+
+                                <div class="row no-gutters align-items-center">
+
+
+                                    <div class="col mr-2">
+
+
+                                        <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">
+
+                                            Domain INACTIVE
+
+                                        </div>
+
+
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800"
+                                             th:text="${inactiveDomains}">
+
+                                            0
+
+                                        </div>
+
+
+                                    </div>
+
+
+                                    <div class="col-auto">
+
+                                        <i class="fas fa-pause-circle fa-2x text-gray-300"></i>
+
+                                    </div>
+
+
+                                </div>
+
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- DNS RECORD -->
+
+                    <div class="col-xl-6 col-md-6 mb-4">
+
+                        <div class="card border-left-info shadow h-100 py-2">
+
+                            <div class="card-body">
+
+
+                                <div class="row no-gutters align-items-center">
+
+
+                                    <div class="col mr-2">
+
+
+                                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+
+                                            Tổng DNS Record đang quản lý
+
+                                        </div>
+
+
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800"
+                                             th:text="${totalRecords}">
+
+                                            0
+
+                                        </div>
+
+
+                                    </div>
+
+
+                                    <div class="col-auto">
+
+                                        <i class="fas fa-server fa-2x text-gray-300"></i>
+
+                                    </div>
+
+
+                                </div>
+
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- RECENT CHANGES -->
+
+                    <div class="col-xl-6 col-md-6 mb-4">
+
+                        <div class="card border-left-warning shadow h-100 py-2">
+
+                            <div class="card-body">
+
+
+                                <div class="row no-gutters align-items-center">
+
+
+                                    <div class="col mr-2">
+
+
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+
+                                            Thay đổi trong 7 ngày gần đây
+
+                                        </div>
+
+
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800"
+                                             th:text="${recentChanges}">
+
+                                            0
+
+                                        </div>
+
+
+                                    </div>
+
+
+                                    <div class="col-auto">
+
+                                        <i class="fas fa-history fa-2x text-gray-300"></i>
+
+                                    </div>
+
+
+                                </div>
+
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- ================================================= -->
+                <!-- QUICK ACCESS -->
+                <!-- ================================================= -->
+
+                <div class="row">
+
+
+                    <div class="col-lg-4 mb-4">
+
+
+                        <div class="card shadow h-100">
+
+
+                            <div class="card-header py-3">
+
+                                <h6 class="m-0 font-weight-bold text-primary">
+
+                                    Quản lý tên miền
+
+                                </h6>
+
+                            </div>
+
+
+                            <div class="card-body">
+
+
+                                <p class="text-gray-600">
+
+                                    Xem, thêm, sửa, tìm kiếm và quản lý trạng thái tên miền.
+
+                                </p>
+
+
+                                <a th:href="@{/domains}"
+                                   class="btn btn-primary btn-block">
+
+                                    <i class="fas fa-globe"></i>
+
+                                    Mở danh sách Domain
+
+                                </a>
+
+
+                            </div>
+
+
+                        </div>
+
+
+                    </div>
+
+
+                    <div class="col-lg-4 mb-4">
+
+
+                        <div class="card shadow h-100">
+
+
+                            <div class="card-header py-3">
+
+                                <h6 class="m-0 font-weight-bold text-primary">
+
+                                    Quản lý DNS Record
+
+                                </h6>
+
+                            </div>
+
+
+                            <div class="card-body">
+
+
+                                <p class="text-gray-600">
+
+                                    Quản lý A, AAAA, CNAME, MX, NS và TXT Record.
+
+                                </p>
+
+
+                                <a th:href="@{/records}"
+                                   class="btn btn-info btn-block">
+
+                                    <i class="fas fa-server"></i>
+
+                                    Mở DNS Records
+
+                                </a>
+
+
+                            </div>
+
+
+                        </div>
+
+
+                    </div>
+
+
+                    <div class="col-lg-4 mb-4">
+
+
+                        <div class="card shadow h-100">
+
+
+                            <div class="card-header py-3">
+
+                                <h6 class="m-0 font-weight-bold text-primary">
+
+                                    Lịch sử thay đổi
+
+                                </h6>
+
+                            </div>
+
+
+                            <div class="card-body">
+
+
+                                <p class="text-gray-600">
+
+                                    Xem CREATE, UPDATE, DELETE và dữ liệu trước/sau thay đổi.
+
+                                </p>
+
+
+                                <a th:href="@{/history}"
+                                   class="btn btn-warning btn-block">
+
+                                    <i class="fas fa-history"></i>
+
+                                    Xem History
+
+                                </a>
+
+
+                            </div>
+
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+        <!-- FOOTER -->
+
+        <footer class="sticky-footer bg-white">
+
+
+            <div class="container my-auto">
+
+
+                <div class="copyright text-center my-auto">
+
+                    <span>
+                        VNNIC DNS Management System
+                    </span>
+
+                </div>
+
+
+            </div>
+
+
+        </footer>
+
+
+    </div>
+
+
+</div>
+
+
+<script th:src="@{/vendor/jquery/jquery.min.js}"></script>
+
+<script th:src="@{/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
+
+<script th:src="@{/vendor/jquery-easing/jquery.easing.min.js}"></script>
+
+<script th:src="@{/js/sb-admin-2.min.js}"></script>
+
+
+</body>
+
+</html>

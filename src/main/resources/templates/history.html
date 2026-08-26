@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
+
+    <title>Lịch sử thay đổi - VNNIC DNS Manager</title>
+
+    <link th:href="@{/vendor/fontawesome-free/css/all.min.css}"
+          rel="stylesheet">
+
+    <link th:href="@{/css/sb-admin-2.min.css}"
+          rel="stylesheet">
+
+</head>
+
+
+<body id="page-top">
+
+
+<div id="wrapper">
+
+
+    <!-- ================================================= -->
+    <!-- SIDEBAR -->
+    <!-- ================================================= -->
+
+    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion"
+        id="accordionSidebar">
+
+
+        <a class="sidebar-brand d-flex align-items-center justify-content-center"
+           th:href="@{/}">
+
+            <div class="sidebar-brand-icon">
+                <i class="fas fa-network-wired"></i>
+            </div>
+
+            <div class="sidebar-brand-text mx-3">
+                VNNIC DNS
+            </div>
+
+        </a>
+
+
+        <hr class="sidebar-divider my-0">
+
+
+        <li class="nav-item">
+
+            <a class="nav-link"
+               th:href="@{/}">
+
+                <i class="fas fa-fw fa-tachometer-alt"></i>
+
+                <span>Dashboard</span>
+
+            </a>
+
+        </li>
+
+
+        <hr class="sidebar-divider">
+
+
+        <div class="sidebar-heading">
+            Quản lý
+        </div>
+
+
+        <li class="nav-item">
+
+            <a class="nav-link"
+               th:href="@{/domains}">
+
+                <i class="fas fa-fw fa-globe"></i>
+
+                <span>Tên miền</span>
+
+            </a>
+
+        </li>
+
+
+        <li class="nav-item">
+
+            <a class="nav-link"
+               th:href="@{/records}">
+
+                <i class="fas fa-fw fa-server"></i>
+
+                <span>Bản ghi DNS</span>
+
+            </a>
+
+        </li>
+
+
+        <li class="nav-item active">
+
+            <a class="nav-link"
+               th:href="@{/history}">
+
+                <i class="fas fa-fw fa-history"></i>
+
+                <span>Lịch sử thay đổi</span>
+
+            </a>
+
+        </li>
+
+
+        <hr class="sidebar-divider d-none d-md-block">
+
+
+        <div class="text-center d-none d-md-inline">
+
+            <button class="rounded-circle border-0"
+                    id="sidebarToggle">
+            </button>
+
+        </div>
+
+
+    </ul>
+
+
+    <!-- ================================================= -->
+    <!-- CONTENT WRAPPER -->
+    <!-- ================================================= -->
+
+    <div id="content-wrapper"
+         class="d-flex flex-column">
+
+
+        <div id="content">
+
+
+            <!-- ============================================= -->
+            <!-- TOPBAR -->
+            <!-- ============================================= -->
+
+            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+
+                <button id="sidebarToggleTop"
+                        class="btn btn-link d-md-none rounded-circle mr-3">
+
+                    <i class="fa fa-bars"></i>
+
+                </button>
+
+
+                <span class="font-weight-bold text-gray-800">
+
+                    Hệ thống quản lý tên miền và DNS
+
+                </span>
+
+
+            </nav>
+
+
+            <!-- ============================================= -->
+            <!-- MAIN -->
+            <!-- ============================================= -->
+
+            <div class="container-fluid">
+
+
+                <!-- TITLE -->
+
+                <div class="d-sm-flex align-items-center justify-content-between mb-4">
+
+
+                    <div>
+
+                        <h1 class="h3 mb-1 text-gray-800">
+
+                            Lịch sử thay đổi DNS
+
+                        </h1>
+
+
+                        <p class="mb-0 text-gray-600">
+
+                            Theo dõi các thao tác CREATE, UPDATE và DELETE
+                            đối với DNS Record.
+
+                        </p>
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- ============================================= -->
+                <!-- ERROR -->
+                <!-- ============================================= -->
+
+                <div th:if="${errorMessage != null}"
+                     class="alert alert-danger">
+
+                    <i class="fas fa-exclamation-triangle mr-1"></i>
+
+                    <span th:text="${errorMessage}"></span>
+
+                </div>
+
+
+                <!-- ============================================= -->
+                <!-- FILTER -->
+                <!-- ============================================= -->
+
+                <div class="card shadow mb-4">
+
+
+                    <div class="card-header py-3">
+
+                        <h6 class="m-0 font-weight-bold text-primary">
+
+                            Tìm kiếm và lọc lịch sử
+
+                        </h6>
+
+                    </div>
+
+
+                    <div class="card-body">
+
+
+                        <form th:action="@{/history}"
+                              method="get">
+
+
+                            <div class="form-row">
+
+
+                                <!-- DOMAIN -->
+
+                                <div class="form-group col-lg-3 col-md-6">
+
+                                    <label>
+                                        Tên miền
+                                    </label>
+
+
+                                    <select class="form-control"
+                                            name="domainId">
+
+                                        <option value="">
+                                            Tất cả tên miền
+                                        </option>
+
+
+                                        <option th:each="domain : ${domains}"
+                                                th:value="${domain.id}"
+                                                th:text="${domain.domainName}"
+                                                th:selected="${domainId != null
+                                                        and domainId == domain.id}">
+
+                                        </option>
+
+                                    </select>
+
+                                </div>
+
+
+                                <!-- RECORD ID -->
+
+                                <div class="form-group col-lg-2 col-md-6">
+
+                                    <label>
+                                        Record ID
+                                    </label>
+
+
+                                    <input type="number"
+                                           min="1"
+                                           class="form-control"
+                                           name="recordId"
+                                           placeholder="Ví dụ: 10"
+                                           th:value="${recordId}">
+
+                                </div>
+
+
+                                <!-- ACTION -->
+
+                                <div class="form-group col-lg-2 col-md-6">
+
+                                    <label>
+                                        Thao tác
+                                    </label>
+
+
+                                    <select class="form-control"
+                                            name="actionType">
+
+                                        <option value="">
+                                            Tất cả
+                                        </option>
+
+
+                                        <option value="CREATE"
+                                                th:selected="${actionType == 'CREATE'}">
+
+                                            CREATE
+
+                                        </option>
+
+
+                                        <option value="UPDATE"
+                                                th:selected="${actionType == 'UPDATE'}">
+
+                                            UPDATE
+
+                                        </option>
+
+
+                                        <option value="DELETE"
+                                                th:selected="${actionType == 'DELETE'}">
+
+                                            DELETE
+
+                                        </option>
+
+                                    </select>
+
+                                </div>
+
+
+                                <!-- FROM -->
+
+                                <div class="form-group col-lg-2 col-md-6">
+
+                                    <label>
+                                        Từ ngày
+                                    </label>
+
+
+                                    <input type="date"
+                                           class="form-control"
+                                           name="fromDate"
+                                           th:value="${fromDate}">
+
+                                </div>
+
+
+                                <!-- TO -->
+
+                                <div class="form-group col-lg-2 col-md-6">
+
+                                    <label>
+                                        Đến ngày
+                                    </label>
+
+
+                                    <input type="date"
+                                           class="form-control"
+                                           name="toDate"
+                                           th:value="${toDate}">
+
+                                </div>
+
+
+                                <!-- SEARCH BUTTON -->
+
+                                <div class="form-group col-lg-1 col-md-6 d-flex align-items-end">
+
+                                    <button type="submit"
+                                            class="btn btn-primary btn-block">
+
+                                        <i class="fas fa-search"></i>
+
+                                    </button>
+
+                                </div>
+
+
+                            </div>
+
+
+                            <a th:href="@{/history}"
+                               class="btn btn-secondary btn-sm">
+
+                                <i class="fas fa-redo mr-1"></i>
+
+                                Xóa bộ lọc
+
+                            </a>
+
+
+                        </form>
+
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- ============================================= -->
+                <!-- HISTORY TABLE -->
+                <!-- ============================================= -->
+
+                <div class="card shadow mb-4">
+
+
+                    <div class="card-header py-3 d-flex justify-content-between align-items-center">
+
+
+                        <h6 class="m-0 font-weight-bold text-primary">
+
+                            Nhật ký thay đổi
+
+                        </h6>
+
+
+                        <span class="badge badge-secondary"
+                              th:text="${#lists.size(histories) + ' bản ghi'}">
+
+                            0 bản ghi
+
+                        </span>
+
+
+                    </div>
+
+
+                    <div class="card-body">
+
+
+                        <!-- EMPTY -->
+
+                        <div th:if="${#lists.isEmpty(histories)}"
+                             class="text-center text-gray-500 py-5">
+
+                            <i class="fas fa-history fa-3x mb-3"></i>
+
+                            <p class="mb-0">
+
+                                Chưa có lịch sử thay đổi phù hợp.
+
+                            </p>
+
+                        </div>
+
+
+                        <!-- TABLE -->
+
+                        <div class="table-responsive"
+                             th:unless="${#lists.isEmpty(histories)}">
+
+
+                            <table class="table table-bordered table-hover"
+                                   width="100%"
+                                   cellspacing="0">
+
+
+                                <thead class="thead-light">
+
+                                <tr>
+
+                                    <th>ID</th>
+
+                                    <th>Record ID</th>
+
+                                    <th>Domain ID</th>
+
+                                    <th>Action</th>
+
+                                    <th>Thay đổi</th>
+
+                                    <th>Thời gian</th>
+
+                                    <th>Mô tả</th>
+
+                                </tr>
+
+                                </thead>
+
+
+                                <tbody>
+
+
+                                <tr th:each="history : ${histories}">
+
+
+                                    <!-- HISTORY ID -->
+
+                                    <td th:text="${history.id}">
+                                        1
+                                    </td>
+
+
+                                    <!-- RECORD ID -->
+
+                                    <td>
+
+                                        <a th:if="${history.dnsRecordId != null}"
+                                           th:href="@{/records/{id}(id=${history.dnsRecordId})}"
+                                           th:text="${history.dnsRecordId}">
+
+                                            1
+
+                                        </a>
+
+
+                                        <span th:if="${history.dnsRecordId == null}">
+                                            -
+                                        </span>
+
+                                    </td>
+
+
+                                    <!-- DOMAIN ID -->
+
+                                    <td th:text="${history.domainId}">
+                                        1
+                                    </td>
+
+
+                                    <!-- ACTION -->
+
+                                    <td>
+
+
+                                        <span th:if="${history.actionType == 'CREATE'}"
+                                              class="badge badge-success">
+
+                                            CREATE
+
+                                        </span>
+
+
+                                        <span th:if="${history.actionType == 'UPDATE'}"
+                                              class="badge badge-warning">
+
+                                            UPDATE
+
+                                        </span>
+
+
+                                        <span th:if="${history.actionType == 'DELETE'}"
+                                              class="badge badge-danger">
+
+                                            DELETE
+
+                                        </span>
+
+
+                                    </td>
+
+
+                                    <!-- CHANGE -->
+
+                                    <td>
+
+
+                                        <!-- ================================= -->
+                                        <!-- CREATE -->
+                                        <!-- ================================= -->
+
+                                        <div th:if="${history.actionType == 'CREATE'}">
+
+
+                                            <div>
+
+                                                <strong>Hostname:</strong>
+
+                                                <span th:text="${history.afterHostname}">
+                                                    -
+                                                </span>
+
+                                            </div>
+
+
+                                            <div>
+
+                                                <strong>Type:</strong>
+
+                                                <span th:text="${history.afterRecordType}">
+                                                    -
+                                                </span>
+
+                                            </div>
+
+
+                                            <div>
+
+                                                <strong>Value:</strong>
+
+                                                <span th:text="${history.afterValue}">
+                                                    -
+                                                </span>
+
+                                            </div>
+
+
+                                        </div>
+
+
+                                        <!-- ================================= -->
+                                        <!-- UPDATE -->
+                                        <!-- ================================= -->
+
+                                        <div th:if="${history.actionType == 'UPDATE'}">
+
+
+                                            <div>
+
+                                                <strong>Hostname:</strong>
+
+                                                <span th:text="${history.beforeHostname}">
+                                                    -
+                                                </span>
+
+                                                →
+
+                                                <span th:text="${history.afterHostname}">
+                                                    -
+                                                </span>
+
+                                            </div>
+
+
+                                            <div>
+
+                                                <strong>Type:</strong>
+
+                                                <span th:text="${history.beforeRecordType}">
+                                                    -
+                                                </span>
+
+                                                →
+
+                                                <span th:text="${history.afterRecordType}">
+                                                    -
+                                                </span>
+
+                                            </div>
+
+
+                                            <div>
+
+                                                <strong>Value:</strong>
+
+                                                <span th:text="${history.beforeValue}">
+                                                    -
+                                                </span>
+
+                                                →
+
+                                                <span th:text="${history.afterValue}">
+                                                    -
+                                                </span>
+
+                                            </div>
+
+
+                                            <div>
+
+                                                <strong>TTL:</strong>
+
+                                                <span th:text="${history.beforeTtl}">
+                                                    -
+                                                </span>
+
+                                                →
+
+                                                <span th:text="${history.afterTtl}">
+                                                    -
+                                                </span>
+
+                                            </div>
+
+
+                                            <div>
+
+                                                <strong>Priority:</strong>
+
+                                                <span th:text="${history.beforePriority != null
+                                                        ? history.beforePriority
+                                                        : '-'}">
+                                                </span>
+
+                                                →
+
+                                                <span th:text="${history.afterPriority != null
+                                                        ? history.afterPriority
+                                                        : '-'}">
+                                                </span>
+
+                                            </div>
+
+
+                                        </div>
+
+
+                                        <!-- ================================= -->
+                                        <!-- DELETE -->
+                                        <!-- ================================= -->
+
+                                        <div th:if="${history.actionType == 'DELETE'}">
+
+
+                                            <div>
+
+                                                <strong>Hostname:</strong>
+
+                                                <span th:text="${history.beforeHostname}">
+                                                    -
+                                                </span>
+
+                                            </div>
+
+
+                                            <div>
+
+                                                <strong>Type:</strong>
+
+                                                <span th:text="${history.beforeRecordType}">
+                                                    -
+                                                </span>
+
+                                            </div>
+
+
+                                            <div>
+
+                                                <strong>Value:</strong>
+
+                                                <span th:text="${history.beforeValue}">
+                                                    -
+                                                </span>
+
+                                            </div>
+
+
+                                        </div>
+
+
+                                    </td>
+
+
+                                    <!-- TIME -->
+
+                                    <td>
+
+                                        <span th:if="${history.changedAt != null}"
+                                              th:text="${#temporals.format(
+                                                        history.changedAt,
+                                                        'dd/MM/yyyy HH:mm:ss'
+                                              )}">
+
+                                            25/08/2026 10:30:00
+
+                                        </span>
+
+
+                                        <span th:if="${history.changedAt == null}">
+                                            -
+                                        </span>
+
+                                    </td>
+
+
+                                    <!-- DESCRIPTION -->
+
+                                    <td th:text="${history.description != null
+                                            ? history.description
+                                            : '-'}">
+
+                                        -
+
+                                    </td>
+
+
+                                </tr>
+
+
+                                </tbody>
+
+
+                            </table>
+
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- FOOTER -->
+        <!-- ================================================= -->
+
+        <footer class="sticky-footer bg-white">
+
+
+            <div class="container my-auto">
+
+
+                <div class="copyright text-center my-auto">
+
+                    <span>
+                        VNNIC DNS Management System
+                    </span>
+
+                </div>
+
+
+            </div>
+
+
+        </footer>
+
+
+    </div>
+
+
+</div>
+
+
+<script th:src="@{/vendor/jquery/jquery.min.js}"></script>
+
+<script th:src="@{/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
+
+<script th:src="@{/vendor/jquery-easing/jquery.easing.min.js}"></script>
+
+<script th:src="@{/js/sb-admin-2.min.js}"></script>
+
+
+</body>
+
+</html>

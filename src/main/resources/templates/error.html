@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
+
+    <title>Lỗi - VNNIC DNS Manager</title>
+
+    <link th:href="@{/vendor/fontawesome-free/css/all.min.css}"
+          rel="stylesheet">
+
+    <link th:href="@{/css/sb-admin-2.min.css}"
+          rel="stylesheet">
+
+</head>
+
+<body class="bg-gradient-primary">
+
+
+<div class="container">
+
+
+    <div class="row justify-content-center">
+
+
+        <div class="col-xl-7 col-lg-8 col-md-10">
+
+
+            <div class="card o-hidden border-0 shadow-lg my-5">
+
+
+                <div class="card-body p-0">
+
+
+                    <div class="p-5 text-center">
+
+
+                        <i class="fas fa-exclamation-triangle
+                                  fa-4x text-warning mb-4">
+                        </i>
+
+
+                        <h1 class="h4 text-gray-900 mb-3"
+                            th:text="${errorTitle != null
+                                    ? errorTitle
+                                    : 'Đã xảy ra lỗi'}">
+
+                            Đã xảy ra lỗi
+
+                        </h1>
+
+
+                        <div class="alert alert-danger text-left">
+
+                            <strong>
+                                Chi tiết:
+                            </strong>
+
+                            <span th:text="${errorMessage != null
+                                    ? errorMessage
+                                    : 'Không thể hoàn thành yêu cầu.'}">
+
+                                Không thể hoàn thành yêu cầu.
+
+                            </span>
+
+                        </div>
+
+
+                        <p class="text-gray-600"
+                           th:if="${requestPath != null}">
+
+                            Đường dẫn:
+
+                            <code th:text="${requestPath}"></code>
+
+                        </p>
+
+
+                        <hr>
+
+
+                        <button type="button"
+                                class="btn btn-secondary mr-2"
+                                onclick="history.back()">
+
+                            <i class="fas fa-arrow-left mr-1"></i>
+
+                            Quay lại
+
+                        </button>
+
+
+                        <a th:href="@{/}"
+                           class="btn btn-primary">
+
+                            <i class="fas fa-home mr-1"></i>
+
+                            Dashboard
+
+                        </a>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+<script th:src="@{/vendor/jquery/jquery.min.js}"></script>
+
+<script th:src="@{/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
+
+</body>
+
+</html>
