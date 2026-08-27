@@ -20,7 +20,10 @@ public class DnsRecordController {
 
     private final DnsRecordService dnsRecordService;
     private final DomainService domainService;
+
+    // =====================================================
     // CONSTRUCTOR
+    // =====================================================
 
     public DnsRecordController(
             DnsRecordService dnsRecordService,
@@ -30,29 +33,21 @@ public class DnsRecordController {
         this.domainService = domainService;
     }
 
-
+    // =====================================================
     // 1. DANH SÁCH DNS RECORD
     //
     // Hỗ trợ:
-    // - theo Domain
-    // - tìm kiếm hostname / value
+    // - chọn Domain
+    // - tìm hostname / value
     // - lọc theo record type
-    // 
+    // =====================================================
 
     @GetMapping("/records")
     public String records(
-
-            @RequestParam(required = false)
-            Long domainId,
-
-            @RequestParam(required = false)
-            String keyword,
-
-            @RequestParam(required = false)
-            String recordType,
-
+            @RequestParam(required = false) Long domainId,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String recordType,
             Model model) {
-
 
         loadRecordsPage(
                 domainId,
@@ -61,24 +56,19 @@ public class DnsRecordController {
                 model
         );
 
-
         return "records";
     }
 
-    // 2. THÊM DNS RECORD
+    // =====================================================
+    // 2. CREATE DNS RECORD
+    // =====================================================
 
     @PostMapping("/records")
     public String createRecord(
-
-            @RequestParam
-            Long domainId,
-
+            @RequestParam Long domainId,
             DnsRecord record,
-
             Model model,
-
             RedirectAttributes redirectAttributes) {
-
 
         try {
 
@@ -88,7 +78,6 @@ public class DnsRecordController {
                             record
                     );
 
-
             redirectAttributes.addFlashAttribute(
                     "successMessage",
                     "Đã thêm DNS Record "
@@ -96,36 +85,28 @@ public class DnsRecordController {
                             + " thành công."
             );
 
-
             return "redirect:/records?domainId="
                     + domainId;
-
 
         } catch (IllegalArgumentException
                 | IllegalStateException e) {
 
-
             /*
-             * Hiển thị lỗi trên records.html.
-             * Không cho rơi vào Whitelabel.
+             * Hiển thị lỗi ngay trên records.html.
              */
-
             model.addAttribute(
                     "errorMessage",
                     e.getMessage()
             );
 
-
             /*
-             * Giữ dữ liệu người dùng vừa nhập.
-             * records.html dùng recordForm
-             * để điền lại modal Add Record.
+             * Giữ dữ liệu người dùng vừa nhập
+             * để form có thể hiển thị lại.
              */
             model.addAttribute(
                     "recordForm",
                     record
             );
-
 
             loadRecordsPage(
                     domainId,
@@ -134,63 +115,40 @@ public class DnsRecordController {
                     model
             );
 
-
             return "records";
         }
     }
 
-
-    // 
+    // =====================================================
     // 3. XEM CHI TIẾT DNS RECORD
-    // 
+    // =====================================================
 
     @GetMapping("/records/{id}")
     public String recordDetail(
-
-            @PathVariable
-            Long id,
-
+            @PathVariable Long id,
             Model model) {
-
 
         DnsRecord record =
                 dnsRecordService.getRecordById(id);
-
 
         model.addAttribute(
                 "record",
                 record
         );
 
-
         return "record-detail";
     }
 
-
-    // 
-    // 4. CẬP NHẬT DNS RECORD
-    //
-    // DnsRecordService sẽ:
-    // - copy BEFORE
-    // - normalize
-    // - validate
-    // - duplicate check
-    // - save
-    // - ghi History UPDATE
-    // 
+    // =====================================================
+    // 4. UPDATE DNS RECORD
+    // =====================================================
 
     @PostMapping("/records/{id}/edit")
     public String updateRecord(
-
-            @PathVariable
-            Long id,
-
+            @PathVariable Long id,
             DnsRecord newRecord,
-
             Model model,
-
             RedirectAttributes redirectAttributes) {
-
 
         try {
 
@@ -200,7 +158,6 @@ public class DnsRecordController {
                             newRecord
                     );
 
-
             redirectAttributes.addFlashAttribute(
                     "successMessage",
                     "Đã cập nhật DNS Record "
@@ -208,102 +165,91 @@ public class DnsRecordController {
                             + " thành công."
             );
 
-
             return "redirect:/records/"
                     + updatedRecord.getId();
 
-
         } catch (IllegalArgumentException
                 | IllegalStateException e) {
-
 
             model.addAttribute(
                     "errorMessage",
                     e.getMessage()
             );
 
-
             /*
-             * Lấy lại dữ liệu thật trong DB.
-             * Nếu validation thất bại thì transaction
-             * không lưu dữ liệu mới.
+             * Vì update fail nên dữ liệu trong DB
+             * vẫn là dữ liệu cũ.
              */
             DnsRecord currentRecord =
                     dnsRecordService.getRecordById(id);
-
 
             model.addAttribute(
                     "record",
                     currentRecord
             );
 
-
             return "record-detail";
         }
     }
 
-
-    // 
-    // 5. XÓA MỀM DNS RECORD
+    // =====================================================
+    // 5. SOFT DELETE DNS RECORD
     //
     // ACTIVE / INACTIVE
-    //          ↓
-    //       DELETED
+    //        ↓
+    //     DELETED
     //
-    // Service đồng thời ghi History DELETE.
-    // 
+    // DnsRecordService hiện dùng:
+    // deleteRecord(Long id)
+    // =====================================================
 
     @PostMapping("/records/{id}/delete")
     public String softDeleteRecord(
-
-            @PathVariable
-            Long id,
-
+            @PathVariable Long id,
             Model model,
-
             RedirectAttributes redirectAttributes) {
 
-
         /*
-         * Lấy Domain ID trước khi thao tác.
+         * Lấy record trước để giữ domainId
+         * và tên record cho redirect/message.
          */
         DnsRecord currentRecord =
                 dnsRecordService.getRecordById(id);
-
 
         Long domainId =
                 currentRecord
                         .getDomain()
                         .getId();
 
+        String recordName =
+                buildDisplayName(
+                        currentRecord
+                );
 
         try {
 
-            DnsRecord deletedRecord =
-                    dnsRecordService.deleteRecord(id);
-
+            /*
+             * Đây là soft delete thực tế.
+             */
+            dnsRecordService.deleteRecord(id);
 
             redirectAttributes.addFlashAttribute(
                     "successMessage",
                     "DNS Record "
-                            + buildDisplayName(deletedRecord)
+                            + recordName
                             + " đã chuyển sang DELETED."
             );
-
 
             return "redirect:/records?domainId="
                     + domainId;
 
-
         } catch (IllegalArgumentException
                 | IllegalStateException e) {
-
 
             model.addAttribute(
                     "errorMessage",
                     e.getMessage()
             );
-
 
             loadRecordsPage(
                     domainId,
@@ -312,56 +258,42 @@ public class DnsRecordController {
                     model
             );
 
-
             return "records";
         }
     }
 
-
-    // 
+    // =====================================================
     // 6. HARD DELETE DNS RECORD
     //
     // Chỉ record DELETED mới được xóa vật lý.
-    //
-    // History vẫn tồn tại vì History chỉ lưu:
-    // dnsRecordId
-    // domainId
-    // BEFORE / AFTER
-    // 
+    // =====================================================
 
     @PostMapping("/records/{id}/hard-delete")
     public String hardDeleteRecord(
-
-            @PathVariable
-            Long id,
-
+            @PathVariable Long id,
             Model model,
-
             RedirectAttributes redirectAttributes) {
 
-
+        /*
+         * Phải lấy trước thông tin record
+         * vì sau hard delete record sẽ biến mất khỏi DB.
+         */
         DnsRecord currentRecord =
                 dnsRecordService.getRecordById(id);
-
 
         Long domainId =
                 currentRecord
                         .getDomain()
                         .getId();
 
-
         String recordName =
                 buildDisplayName(
                         currentRecord
                 );
 
-
         try {
 
-            dnsRecordService.hardDeleteRecord(
-                    id
-            );
-
+            dnsRecordService.hardDeleteRecord(id);
 
             redirectAttributes.addFlashAttribute(
                     "successMessage",
@@ -370,20 +302,16 @@ public class DnsRecordController {
                             + "."
             );
 
-
             return "redirect:/records?domainId="
                     + domainId;
 
-
         } catch (IllegalArgumentException
                 | IllegalStateException e) {
-
 
             model.addAttribute(
                     "errorMessage",
                     e.getMessage()
             );
-
 
             loadRecordsPage(
                     domainId,
@@ -392,84 +320,86 @@ public class DnsRecordController {
                     model
             );
 
-
             return "records";
         }
     }
 
-
-    // 
-    // HELPER:
-    // LOAD records.html
-    // 
+    // =====================================================
+    // 7. HELPER - LOAD records.html
+    // =====================================================
 
     private void loadRecordsPage(
-
             Long domainId,
             String keyword,
             String recordType,
             Model model) {
 
+        // -------------------------------------------------
+        // DNS RECORD LIST
+        // -------------------------------------------------
 
-        // 
-        // RECORD LIST
-        // 
+        List<DnsRecord> records;
 
-        List<DnsRecord> records =
-                dnsRecordService.searchRecords(
-                        domainId,
-                        keyword,
-                        recordType
-                );
+        /*
+         * Nếu có domainId:
+         * lấy record thuộc domain đó.
+         *
+         * Nếu chưa chọn domain:
+         * hiện danh sách rỗng.
+         */
+        if (domainId != null) {
 
+            records =
+                    dnsRecordService.searchRecords(
+                            domainId,
+                            keyword,
+                            recordType
+                    );
+
+        } else {
+
+            records = List.of();
+        }
 
         model.addAttribute(
                 "records",
                 records
         );
 
-
-        // 
+        // -------------------------------------------------
         // DOMAIN LIST
-        //
-        // Dùng cho dropdown Add Record.
-        // 
+        // -------------------------------------------------
 
         List<Domain> domains =
                 domainService.getAllDomains();
-
 
         model.addAttribute(
                 "domains",
                 domains
         );
 
-
-        // 
-        // GIỮ FILTER
-        // 
+        // -------------------------------------------------
+        // FILTER VALUES
+        // -------------------------------------------------
 
         model.addAttribute(
                 "domainId",
                 domainId
         );
 
-
         model.addAttribute(
                 "keyword",
                 keyword
         );
-
 
         model.addAttribute(
                 "recordType",
                 recordType
         );
 
-
-        // 
-        // DOMAIN HIỆN TẠI
-        // 
+        // -------------------------------------------------
+        // CURRENT DOMAIN
+        // -------------------------------------------------
 
         if (domainId != null) {
 
@@ -478,31 +408,43 @@ public class DnsRecordController {
                             domainId
                     );
 
-
             model.addAttribute(
                     "domain",
                     domain
             );
         }
+
+        // -------------------------------------------------
+        // FORM OBJECT
+        // -------------------------------------------------
+
+        /*
+         * Khi create validation fail,
+         * recordForm đã được Controller thêm vào Model.
+         *
+         * Không ghi đè dữ liệu đó.
+         */
+        if (!model.containsAttribute("recordForm")) {
+
+            model.addAttribute(
+                    "recordForm",
+                    new DnsRecord()
+            );
+        }
     }
 
-
-    // 
-    // HELPER:
-    // HIỂN THỊ FQDN
+    // =====================================================
+    // 8. HELPER - BUILD FQDN DISPLAY
     //
     // @ + example.vn
-    //      ↓
-    // example.vn
+    // -> example.vn
     //
     // www + example.vn
-    //      ↓
-    // www.example.vn
-    // 
+    // -> www.example.vn
+    // =====================================================
 
     private String buildDisplayName(
             DnsRecord record) {
-
 
         if (record == null
                 || record.getDomain() == null) {
@@ -510,16 +452,13 @@ public class DnsRecordController {
             return "";
         }
 
-
         String domainName =
                 record
                         .getDomain()
                         .getDomainName();
 
-
         String hostname =
                 record.getHostname();
-
 
         if (hostname == null
                 || hostname.isBlank()
@@ -528,10 +467,8 @@ public class DnsRecordController {
             return domainName;
         }
 
-
         return hostname
                 + "."
                 + domainName;
     }
-
 }

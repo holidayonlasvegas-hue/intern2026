@@ -13,92 +13,64 @@ import vn.vnnic.dnsmanager.entity.DnsRecord;
 public interface DnsRecordRepository
         extends JpaRepository<DnsRecord, Long> {
 
-
-    // 
-    // 1. LẤY TẤT CẢ DNS RECORD THEO DOMAIN
-    // 
+    // =====================================================
+    // 1. GET ALL RECORDS BY DOMAIN
+    // =====================================================
 
     List<DnsRecord> findByDomainId(
             Long domainId
     );
 
-
-    // 
-    // 2. LẤY DNS RECORD THEO DOMAIN + STATUS
-    // 
+    // =====================================================
+    // 2. GET RECORDS BY DOMAIN + STATUS
+    // =====================================================
 
     List<DnsRecord> findByDomainIdAndStatus(
             Long domainId,
             String status
     );
 
-
-    // 
-    // 3. ĐẾM RECORD THEO DOMAIN + STATUS
-    //
-    // Ví dụ:
-    // count ACTIVE record của example.vn
-    // 
+    // =====================================================
+    // 3. COUNT RECORDS BY DOMAIN + STATUS
+    // =====================================================
 
     long countByDomainIdAndStatus(
             Long domainId,
             String status
     );
 
-
-    // 
-    // 4. KIỂM TRA DOMAIN CÓ CÒN DNS RECORD KHÔNG
-    //
-    // DomainService dùng method này trước khi hard delete.
-    //
-    // Nếu domain vẫn còn bất kỳ DNS Record nào
-    // trong database thì trả về true.
-    // 
+    // =====================================================
+    // 4. CHECK WHETHER DOMAIN STILL HAS RECORDS
+    // =====================================================
 
     boolean existsByDomainId(
             Long domainId
     );
 
-
-    // 
+    // =====================================================
     // 5. DASHBOARD
-    //
-    // Đếm tất cả record có status khác DELETED.
-    //
-    // ACTIVE   -> tính
-    // INACTIVE -> tính
-    // DELETED  -> không tính
-    // 
+    // Count ACTIVE + INACTIVE, exclude DELETED
+    // =====================================================
 
     long countByStatusNot(
             String status
     );
 
-
-    // 
+    // =====================================================
     // 6. SEARCH + FILTER
     //
-    // Có thể kết hợp:
-    //
-    // domainId
-    // keyword
-    // recordType
-    //
-    // keyword tìm trong:
-    //
-    // hostname
-    // recordValue
-    // 
+    // Search by:
+    // - domain
+    // - hostname
+    // - record value
+    // - record type
+    // =====================================================
 
     @Query("""
         SELECT r
         FROM DnsRecord r
-
         WHERE
-            (
-                :domainId IS NULL
-                OR r.domain.id = :domainId
-            )
+            (:domainId IS NULL OR r.domain.id = :domainId)
 
         AND
             (
@@ -114,13 +86,12 @@ public interface DnsRecordRepository
             (
                 :recordType IS NULL
                 OR :recordType = ''
-                OR r.recordType = :recordType
+                OR UPPER(r.recordType) = UPPER(:recordType)
             )
 
         ORDER BY r.id DESC
         """)
     List<DnsRecord> searchRecords(
-
             @Param("domainId")
             Long domainId,
 
@@ -131,27 +102,16 @@ public interface DnsRecordRepository
             String recordType
     );
 
-
-    // 
-    // 7. CHECK DUPLICATE DNS RECORD
+    // =====================================================
+    // 7. DUPLICATE CHECK - CREATE
     //
-    // Duplicate nếu giống cả:
+    // Duplicate key:
     //
     // domain_id
-    // hostname
-    // record_type
-    // record_value
-    //
-    // Ví dụ không hợp lệ:
-    //
-    // www | A | 203.119.10.10
-    // www | A | 203.119.10.10
-    //
-    // Nhưng vẫn cho phép:
-    //
-    // www | A | 203.119.10.10
-    // www | A | 203.119.10.11
-    // 
+    // + hostname
+    // + record_type
+    // + record_value
+    // =====================================================
 
     boolean existsByDomainIdAndHostnameAndRecordTypeAndRecordValue(
             Long domainId,
@@ -160,4 +120,26 @@ public interface DnsRecordRepository
             String recordValue
     );
 
+    // =====================================================
+    // 8. DUPLICATE CHECK - UPDATE
+    //
+    // Same duplicate rule as CREATE,
+    // but exclude the record currently being updated.
+    //
+    // Example:
+    //
+    // Record 10:
+    // www | A | 203.119.10.10
+    //
+    // Updating record 10 without changing these values
+    // must NOT be considered a duplicate of itself.
+    // =====================================================
+
+    boolean existsByDomainIdAndHostnameAndRecordTypeAndRecordValueAndIdNot(
+            Long domainId,
+            String hostname,
+            String recordType,
+            String recordValue,
+            Long id
+    );
 }

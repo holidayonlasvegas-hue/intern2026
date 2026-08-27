@@ -3,6 +3,8 @@ package vn.vnnic.dnsmanager.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,15 +16,17 @@ import vn.vnnic.dnsmanager.validation.DnsRecordValidator;
 @Service
 public class DnsRecordService {
 
+    private static final Logger logger =
+            LoggerFactory.getLogger(DnsRecordService.class);
+
     private final DnsRecordRepository dnsRecordRepository;
     private final DomainService domainService;
     private final DnsRecordValidator dnsRecordValidator;
     private final DnsRecordHistoryService historyService;
 
-
-    // 
+    // =====================================================
     // CONSTRUCTOR
-    // 
+    // =====================================================
 
     public DnsRecordService(
             DnsRecordRepository dnsRecordRepository,
@@ -36,50 +40,58 @@ public class DnsRecordService {
         this.historyService = historyService;
     }
 
-
-    // 
-    // 1. XEM TOÀN BỘ DNS RECORD
-    // 
+    // =====================================================
+    // 1. GET ALL DNS RECORDS
+    // =====================================================
 
     public List<DnsRecord> getAllRecords() {
+
+        logger.debug("Loading all DNS records");
 
         return dnsRecordRepository.findAll();
     }
 
-
-    // 
-    // 2. XEM DNS RECORD THEO DOMAIN
-    // 
+    // =====================================================
+    // 2. GET RECORDS BY DOMAIN
+    // =====================================================
 
     public List<DnsRecord> getRecordsByDomain(
             Long domainId) {
+
+        logger.debug(
+                "Loading DNS records for domainId={}",
+                domainId
+        );
 
         return dnsRecordRepository
                 .findByDomainId(domainId);
     }
 
-
-    // 
-    // 3. XEM CHI TIẾT DNS RECORD
-    // 
+    // =====================================================
+    // 3. GET RECORD DETAIL
+    // =====================================================
 
     public DnsRecord getRecordById(
             Long id) {
 
         return dnsRecordRepository
                 .findById(id)
-                .orElseThrow(() ->
-                        new IllegalArgumentException(
-                                "Không tìm thấy DNS Record có ID: "
-                                        + id
-                        )
-                );
+                .orElseThrow(() -> {
+
+                    logger.warn(
+                            "DNS record not found: id={}",
+                            id
+                    );
+
+                    return new IllegalArgumentException(
+                            "Không tìm thấy DNS Record có ID: " + id
+                    );
+                });
     }
 
-
-    // 
-    // 4. ĐẾM RECORD ACTIVE THEO DOMAIN
-    // 
+    // =====================================================
+    // 4. COUNT ACTIVE RECORDS BY DOMAIN
+    // =====================================================
 
     public long countActiveRecords(
             Long domainId) {
@@ -91,130 +103,217 @@ public class DnsRecordService {
                 );
     }
 
-
-    // 
+    // =====================================================
     // 5. DASHBOARD
-    // KHÔNG TÍNH RECORD DELETED
-    // 
+    // COUNT RECORDS EXCEPT DELETED
+    // =====================================================
 
     public long countManagedRecords() {
 
         return dnsRecordRepository
-                .countByStatusNot(
-                        "DELETED"
-                );
+                .countByStatusNot("DELETED");
     }
 
-
-    // 
+    // =====================================================
     // 6. CREATE DNS RECORD
-    // 
+    // =====================================================
 
     @Transactional
     public DnsRecord createRecord(
             Long domainId,
             DnsRecord record) {
 
-        // Domain phải tồn tại
-        Domain domain =
-                domainService
-                        .getDomainById(domainId);
+        logger.info(
+                "Creating DNS record: domainId={}, hostname={}, type={}, value={}",
+                domainId,
+                record != null ? record.getHostname() : null,
+                record != null ? record.getRecordType() : null,
+                record != null ? record.getRecordValue() : null
+        );
 
+        if (record == null) {
 
-        // Không cho thêm record vào domain DELETED
-        if ("DELETED".equals(
-                domain.getStatus())) {
+            logger.warn(
+                    "DNS record creation rejected: record is null"
+            );
 
-            throw new IllegalStateException(
-                    "Không thể thêm DNS Record "
-                            + "cho tên miền đã DELETED."
+            throw new IllegalArgumentException(
+                    "DNS Record không được để trống."
             );
         }
 
+        // -------------------------------------------------
+        // 1. DOMAIN PHẢI TỒN TẠI
+        // -------------------------------------------------
 
-        // Mỗi DNS Record bắt buộc thuộc một Domain
+        Domain domain =
+                domainService.getDomainById(domainId);
+
+        // -------------------------------------------------
+        // 2. KHÔNG CHO THÊM RECORD VÀO DOMAIN DELETED
+        // -------------------------------------------------
+
+        if ("DELETED".equalsIgnoreCase(
+                domain.getStatus())) {
+
+            logger.warn(
+                    "DNS record creation rejected: domainId={} is DELETED",
+                    domainId
+            );
+
+            throw new IllegalStateException(
+                    "Không thể thêm DNS Record cho tên miền đã DELETED."
+            );
+        }
+
+        /*
+         * QUAN TRỌNG:
+         *
+         * Phải gắn Domain vào DNS Record
+         * TRƯỚC khi gọi Validator.
+         *
+         * Validator có rule:
+         * record.getDomain() != null
+         */
         record.setDomain(domain);
 
-
-        // Chuẩn hóa dữ liệu
-        normalizeRecord(record);
-
-
-        // Validate A, AAAA, CNAME, MX, TTL...
-        dnsRecordValidator.validate(
-                record
+        logger.debug(
+                "Domain assigned to DNS record: domainId={}",
+                record.getDomain() != null
+                        ? record.getDomain().getId()
+                        : null
         );
 
+        // -------------------------------------------------
+        // 3. NORMALIZE
+        // -------------------------------------------------
 
-        // Không cho tạo record giống hoàn toàn
+        normalizeRecord(record);
+
+        // -------------------------------------------------
+        // 4. VALIDATE
+        // -------------------------------------------------
+
+        try {
+
+            dnsRecordValidator.validate(record);
+
+        } catch (IllegalArgumentException
+                | IllegalStateException ex) {
+
+            logger.warn(
+                    "DNS record validation failed: domainId={}, hostname={}, type={}, reason={}",
+                    domainId,
+                    record.getHostname(),
+                    record.getRecordType(),
+                    ex.getMessage()
+            );
+
+            throw ex;
+        }
+
+        // -------------------------------------------------
+        // 5. DUPLICATE CHECK
+        // -------------------------------------------------
+
         if (isDuplicate(record)) {
+
+            logger.warn(
+                    "Duplicate DNS record rejected: domainId={}, hostname={}, type={}, value={}",
+                    domainId,
+                    record.getHostname(),
+                    record.getRecordType(),
+                    record.getRecordValue()
+            );
 
             throw new IllegalArgumentException(
                     "DNS Record đã tồn tại."
             );
         }
 
+        // -------------------------------------------------
+        // 6. SAVE
+        // -------------------------------------------------
 
-        /*
-         * Flush để database sinh ID trước khi
-         * tạo bản ghi History.
-         */
         DnsRecord savedRecord =
                 dnsRecordRepository
                         .saveAndFlush(record);
 
+        // -------------------------------------------------
+        // 7. HISTORY CREATE
+        // -------------------------------------------------
 
-        // HISTORY CREATE
         historyService.logCreate(
                 savedRecord
         );
 
+        logger.info(
+                "DNS record created successfully: id={}, domainId={}, hostname={}, type={}, value={}",
+                savedRecord.getId(),
+                domainId,
+                savedRecord.getHostname(),
+                savedRecord.getRecordType(),
+                savedRecord.getRecordValue()
+        );
 
         return savedRecord;
     }
 
-
-    // 
+    // =====================================================
     // 7. UPDATE DNS RECORD
-    // 
+    // =====================================================
 
     @Transactional
     public DnsRecord updateRecord(
             Long id,
             DnsRecord newRecord) {
 
+        logger.info(
+                "Updating DNS record: id={}",
+                id
+        );
+
+        if (newRecord == null) {
+
+            throw new IllegalArgumentException(
+                    "Dữ liệu DNS Record không được để trống."
+            );
+        }
+
         DnsRecord current =
                 getRecordById(id);
 
+        // -------------------------------------------------
+        // KHÔNG CHO SỬA RECORD DELETED
+        // -------------------------------------------------
 
-        // Không cho sửa record DELETED
-        if ("DELETED".equals(
+        if ("DELETED".equalsIgnoreCase(
                 current.getStatus())) {
+
+            logger.warn(
+                    "DNS record update rejected: id={} is DELETED",
+                    id
+            );
 
             throw new IllegalStateException(
                     "Không thể cập nhật DNS Record đã DELETED."
             );
         }
 
-
         /*
-         * QUAN TRỌNG:
+         * Snapshot BEFORE.
          *
-         * Copy dữ liệu hiện tại TRƯỚC khi sửa.
-         *
-         * Không được viết:
-         *
+         * Không được:
          * DnsRecord before = current;
          *
-         * vì cả hai sẽ trỏ vào cùng một object.
+         * vì hai biến sẽ cùng trỏ một object.
          */
         DnsRecord before =
                 copyRecord(current);
 
-
-       // 
-        // CẬP NHẬT
-       // 
+        // -------------------------------------------------
+        // UPDATE FIELDS
+        // -------------------------------------------------
 
         current.setHostname(
                 newRecord.getHostname()
@@ -240,82 +339,129 @@ public class DnsRecordService {
                 newRecord.getDescription()
         );
 
-        current.setStatus(
-                newRecord.getStatus()
-        );
+        /*
+         * Nếu form không gửi status,
+         * giữ nguyên status hiện tại.
+         */
+        if (newRecord.getStatus() != null
+                && !newRecord.getStatus().isBlank()) {
 
+            current.setStatus(
+                    newRecord.getStatus()
+            );
+        }
 
-        // Chuẩn hóa
+        // -------------------------------------------------
+        // NORMALIZE
+        // -------------------------------------------------
+
         normalizeRecord(current);
 
+        // -------------------------------------------------
+        // VALIDATE
+        // -------------------------------------------------
 
-        // Validate dữ liệu mới
-        dnsRecordValidator.validate(
-                current
-        );
+        try {
 
+            dnsRecordValidator.validate(
+                    current
+            );
 
-        // Check duplicate nhưng bỏ qua chính record này
-        if (isDuplicateExcludingSelf(
-                current)) {
+        } catch (IllegalArgumentException
+                | IllegalStateException ex) {
+
+            logger.warn(
+                    "DNS record update validation failed: id={}, reason={}",
+                    id,
+                    ex.getMessage()
+            );
+
+            throw ex;
+        }
+
+        // -------------------------------------------------
+        // DUPLICATE CHECK EXCLUDING SELF
+        // -------------------------------------------------
+
+        if (isDuplicateExcludingSelf(current)) {
+
+            logger.warn(
+                    "DNS record update rejected because of duplicate: id={}, hostname={}, type={}, value={}",
+                    id,
+                    current.getHostname(),
+                    current.getRecordType(),
+                    current.getRecordValue()
+            );
 
             throw new IllegalArgumentException(
                     "DNS Record trùng với một DNS Record khác."
             );
         }
 
+        // -------------------------------------------------
+        // SAVE
+        // -------------------------------------------------
 
         DnsRecord savedRecord =
                 dnsRecordRepository
                         .saveAndFlush(current);
 
-
-       // 
+        // -------------------------------------------------
         // HISTORY UPDATE
-        //
-        // before = dữ liệu cũ
-        // savedRecord = dữ liệu mới
-       // 
+        // -------------------------------------------------
 
         historyService.logUpdate(
                 before,
                 savedRecord
         );
 
+        logger.info(
+                "DNS record updated successfully: id={}, hostname={}, type={}, value={}",
+                savedRecord.getId(),
+                savedRecord.getHostname(),
+                savedRecord.getRecordType(),
+                savedRecord.getRecordValue()
+        );
 
         return savedRecord;
     }
 
-
-    // 
+    // =====================================================
     // 8. SOFT DELETE DNS RECORD
-    // 
+    // =====================================================
 
     @Transactional
     public DnsRecord deleteRecord(
             Long id) {
 
+        logger.info(
+                "Soft deleting DNS record: id={}",
+                id
+        );
+
         DnsRecord record =
                 getRecordById(id);
 
-
-        if ("DELETED".equals(
+        if ("DELETED".equalsIgnoreCase(
                 record.getStatus())) {
+
+            logger.warn(
+                    "Soft delete rejected: DNS record id={} already DELETED",
+                    id
+            );
 
             throw new IllegalStateException(
                     "DNS Record đã ở trạng thái DELETED."
             );
         }
 
-
-        // Lưu trạng thái BEFORE
+        // Snapshot BEFORE
         DnsRecord before =
                 copyRecord(record);
 
-
-       // 
+        // -------------------------------------------------
         // SOFT DELETE
-       // 
+        // -------------------------------------------------
 
         record.setStatus(
                 "DELETED"
@@ -325,72 +471,80 @@ public class DnsRecordService {
                 LocalDateTime.now()
         );
 
-
         DnsRecord savedRecord =
                 dnsRecordRepository
                         .saveAndFlush(record);
 
-
-       // 
+        // -------------------------------------------------
         // HISTORY DELETE
-       // 
+        // -------------------------------------------------
 
         historyService.logDelete(
                 before,
                 savedRecord
         );
 
+        logger.info(
+                "DNS record soft deleted successfully: id={}, hostname={}, type={}",
+                savedRecord.getId(),
+                savedRecord.getHostname(),
+                savedRecord.getRecordType()
+        );
 
         return savedRecord;
     }
 
-
-    // 
+    // =====================================================
     // 9. HARD DELETE DNS RECORD
-    // 
+    // =====================================================
 
     @Transactional
     public void hardDeleteRecord(
             Long id) {
 
+        logger.info(
+                "Hard deleting DNS record: id={}",
+                id
+        );
+
         DnsRecord record =
                 getRecordById(id);
 
-
         /*
-         * Chỉ record đã soft-delete mới được
-         * xóa vật lý.
+         * Chỉ record đã soft delete
+         * mới được hard delete.
          */
-        if (!"DELETED".equals(
+        if (!"DELETED".equalsIgnoreCase(
                 record.getStatus())) {
 
+            logger.warn(
+                    "Hard delete rejected: DNS record id={} status={}",
+                    id,
+                    record.getStatus()
+            );
+
             throw new IllegalStateException(
-                    "Chỉ có thể xóa vật lý "
-                            + "DNS Record đã DELETED."
+                    "Chỉ có thể xóa vật lý DNS Record đã DELETED."
             );
         }
 
-
         /*
-         * History không có foreign key object
-         * trực tiếp tới DnsRecord.
-         *
-         * History chỉ giữ dnsRecordId,
-         * nên record bị hard-delete thì
-         * lịch sử vẫn được giữ lại.
+         * History đã giữ dnsRecordId,
+         * vì vậy record có thể bị hard delete
+         * mà history vẫn tồn tại.
          */
-        dnsRecordRepository.delete(
-                record
-        );
-
-
+        dnsRecordRepository.delete(record);
         dnsRecordRepository.flush();
+
+        logger.info(
+                "DNS record hard deleted successfully: id={}",
+                id
+        );
     }
 
-
-    // 
+    // =====================================================
     // 10. SEARCH + FILTER
-    // 
+    // =====================================================
 
     public List<DnsRecord> searchRecords(
             Long domainId,
@@ -398,16 +552,17 @@ public class DnsRecordService {
             String recordType) {
 
         String normalizedKeyword =
-                normalizeNullableText(
-                        keyword
-                );
-
+                normalizeNullableText(keyword);
 
         String normalizedType =
-                normalizeNullableType(
-                        recordType
-                );
+                normalizeNullableType(recordType);
 
+        logger.debug(
+                "Searching DNS records: domainId={}, keyword={}, type={}",
+                domainId,
+                normalizedKeyword,
+                normalizedType
+        );
 
         return dnsRecordRepository
                 .searchRecords(
@@ -417,18 +572,23 @@ public class DnsRecordService {
                 );
     }
 
-
-    // 
+    // =====================================================
     // 11. NORMALIZE DNS RECORD
-    // 
+    // =====================================================
 
     private void normalizeRecord(
             DnsRecord record) {
 
+        if (record == null) {
 
-       // 
+            throw new IllegalArgumentException(
+                    "DNS Record không được null."
+            );
+        }
+
+        // -------------------------------------------------
         // HOSTNAME
-       // 
+        // -------------------------------------------------
 
         record.setHostname(
                 normalizeHostname(
@@ -436,10 +596,9 @@ public class DnsRecordService {
                 )
         );
 
-
-       // 
+        // -------------------------------------------------
         // TYPE
-       // 
+        // -------------------------------------------------
 
         if (record.getRecordType() != null) {
 
@@ -451,10 +610,9 @@ public class DnsRecordService {
             );
         }
 
-
-       // 
+        // -------------------------------------------------
         // VALUE
-       // 
+        // -------------------------------------------------
 
         if (record.getRecordValue() != null) {
 
@@ -465,10 +623,9 @@ public class DnsRecordService {
             );
         }
 
-
-       // 
-        // TTL DEFAULT = 3600
-       // 
+        // -------------------------------------------------
+        // TTL DEFAULT
+        // -------------------------------------------------
 
         if (record.getTtl() == null) {
 
@@ -477,10 +634,9 @@ public class DnsRecordService {
             );
         }
 
-
-       // 
-        // STATUS DEFAULT = ACTIVE
-       // 
+        // -------------------------------------------------
+        // STATUS DEFAULT
+        // -------------------------------------------------
 
         if (record.getStatus() == null
                 || record.getStatus().isBlank()) {
@@ -499,10 +655,9 @@ public class DnsRecordService {
             );
         }
 
-
-       // 
+        // -------------------------------------------------
         // DESCRIPTION
-       // 
+        // -------------------------------------------------
 
         if (record.getDescription() != null) {
 
@@ -511,12 +666,9 @@ public class DnsRecordService {
                             .getDescription()
                             .trim();
 
-
             if (description.isBlank()) {
 
-                record.setDescription(
-                        null
-                );
+                record.setDescription(null);
 
             } else {
 
@@ -526,31 +678,22 @@ public class DnsRecordService {
             }
         }
 
-
-       // 
+        // -------------------------------------------------
         // PRIORITY
         //
-        // Chỉ MX sử dụng Priority.
-       // 
+        // Chỉ MX dùng priority.
+        // -------------------------------------------------
 
         if (!"MX".equals(
                 record.getRecordType())) {
 
-            record.setPriority(
-                    null
-            );
+            record.setPriority(null);
         }
     }
 
-
-    // 
+    // =====================================================
     // 12. NORMALIZE HOSTNAME
-    //
-    // null / blank / @ -> @
-    //
-    // WWW -> www
-    // Mail -> mail
-    // 
+    // =====================================================
 
     private String normalizeHostname(
             String hostname) {
@@ -564,16 +707,14 @@ public class DnsRecordService {
             return "@";
         }
 
-
         return hostname
                 .trim()
                 .toLowerCase();
     }
 
-
-    // 
+    // =====================================================
     // 13. NORMALIZE SEARCH KEYWORD
-    // 
+    // =====================================================
 
     private String normalizeNullableText(
             String value) {
@@ -584,14 +725,12 @@ public class DnsRecordService {
             return null;
         }
 
-
         return value.trim();
     }
 
-
-    // 
+    // =====================================================
     // 14. NORMALIZE RECORD TYPE
-    // 
+    // =====================================================
 
     private String normalizeNullableType(
             String recordType) {
@@ -602,54 +741,32 @@ public class DnsRecordService {
             return null;
         }
 
-
         return recordType
                 .trim()
                 .toUpperCase();
     }
 
-
-    // 
-    // 15. CHECK DUPLICATE KHI CREATE
-    //
-    // domain_id
-    // hostname
-    // record_type
-    // record_value
-    // 
+    // =====================================================
+    // 15. DUPLICATE CHECK WHEN CREATE
+    // =====================================================
 
     private boolean isDuplicate(
             DnsRecord record) {
 
         return dnsRecordRepository
                 .existsByDomainIdAndHostnameAndRecordTypeAndRecordValue(
-
                         record
                                 .getDomain()
                                 .getId(),
-
                         record.getHostname(),
-
                         record.getRecordType(),
-
                         record.getRecordValue()
                 );
     }
 
-
-    // 
-    // 16. CHECK DUPLICATE KHI UPDATE
-    //
-    // Cho phép:
-    //
-    // www | A | 203.119.10.10
-    // www | A | 203.119.10.11
-    //
-    // Không cho:
-    //
-    // www | A | 203.119.10.10
-    // www | A | 203.119.10.10
-    // 
+    // =====================================================
+    // 16. DUPLICATE CHECK WHEN UPDATE
+    // =====================================================
 
     private boolean isDuplicateExcludingSelf(
             DnsRecord record) {
@@ -662,17 +779,13 @@ public class DnsRecordService {
                                         .getId()
                         );
 
-
         return domainRecords
                 .stream()
 
                 // Bỏ qua chính record đang update
                 .filter(other ->
-
                         other.getId() != null
-
-                        &&
-
+                                &&
                         !other.getId()
                                 .equals(
                                         record.getId()
@@ -680,21 +793,16 @@ public class DnsRecordService {
                 )
 
                 .anyMatch(other ->
-
                         equalsIgnoreCase(
                                 other.getHostname(),
                                 record.getHostname()
                         )
-
                         &&
-
                         equalsIgnoreCase(
                                 other.getRecordType(),
                                 record.getRecordType()
                         )
-
                         &&
-
                         equalsText(
                                 other.getRecordValue(),
                                 record.getRecordValue()
@@ -702,12 +810,9 @@ public class DnsRecordService {
                 );
     }
 
-
-    // 
-    // 17. COPY RECORD
-    //
-    // Dùng để lưu BEFORE cho History.
-    // 
+    // =====================================================
+    // 17. COPY RECORD FOR HISTORY BEFORE
+    // =====================================================
 
     private DnsRecord copyRecord(
             DnsRecord source) {
@@ -715,59 +820,60 @@ public class DnsRecordService {
         DnsRecord copy =
                 new DnsRecord();
 
-
         copy.setId(
                 source.getId()
         );
-
 
         copy.setDomain(
                 source.getDomain()
         );
 
-
         copy.setHostname(
                 source.getHostname()
         );
-
 
         copy.setRecordType(
                 source.getRecordType()
         );
 
-
         copy.setRecordValue(
                 source.getRecordValue()
         );
-
 
         copy.setTtl(
                 source.getTtl()
         );
 
-
         copy.setPriority(
                 source.getPriority()
         );
-
 
         copy.setStatus(
                 source.getStatus()
         );
 
-
         copy.setDescription(
                 source.getDescription()
         );
 
+        copy.setCreatedAt(
+                source.getCreatedAt()
+        );
+
+        copy.setUpdatedAt(
+                source.getUpdatedAt()
+        );
+
+        copy.setDeletedAt(
+                source.getDeletedAt()
+        );
 
         return copy;
     }
 
-
-    // 
+    // =====================================================
     // 18. STRING EQUALS IGNORE CASE
-    // 
+    // =====================================================
 
     private boolean equalsIgnoreCase(
             String first,
@@ -780,17 +886,14 @@ public class DnsRecordService {
                     && second == null;
         }
 
-
-        return first
-                .equalsIgnoreCase(
-                        second
-                );
+        return first.equalsIgnoreCase(
+                second
+        );
     }
 
-
-    // 
+    // =====================================================
     // 19. STRING EQUALS
-    // 
+    // =====================================================
 
     private boolean equalsText(
             String first,
@@ -803,10 +906,8 @@ public class DnsRecordService {
                     && second == null;
         }
 
-
         return first.equals(
                 second
         );
     }
-
 }

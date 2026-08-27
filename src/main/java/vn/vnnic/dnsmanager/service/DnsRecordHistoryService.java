@@ -14,6 +14,9 @@ public class DnsRecordHistoryService {
 
     private final DnsRecordHistoryRepository historyRepository;
 
+    // =====================================================
+    // CONSTRUCTOR
+    // =====================================================
 
     public DnsRecordHistoryService(
             DnsRecordHistoryRepository historyRepository) {
@@ -21,10 +24,9 @@ public class DnsRecordHistoryService {
         this.historyRepository = historyRepository;
     }
 
-
-    // 
-    // SEARCH
-    // 
+    // =====================================================
+    // 1. SEARCH HISTORY
+    // =====================================================
 
     public List<DnsRecordHistory> searchHistory(
             Long domainId,
@@ -33,17 +35,7 @@ public class DnsRecordHistoryService {
             LocalDateTime startTime,
             LocalDateTime endTime) {
 
-        String normalizedAction = null;
-
-        if (actionType != null
-                && !actionType.isBlank()) {
-
-            normalizedAction =
-                    actionType
-                            .trim()
-                            .toUpperCase();
-        }
-
+        String normalizedAction = normalizeActionType(actionType);
 
         return historyRepository.searchHistory(
                 domainId,
@@ -54,13 +46,17 @@ public class DnsRecordHistoryService {
         );
     }
 
+    // =====================================================
+    // 2. LOG CREATE
+    //
+    // CREATE:
+    // before = null
+    // after  = record mới
+    // =====================================================
 
-    // 
-    // CREATE
-    // 
+    public void logCreate(DnsRecord record) {
 
-    public void logCreate(
-            DnsRecord record) {
+        validateRecord(record);
 
         DnsRecordHistory history =
                 baseHistory(
@@ -69,28 +65,28 @@ public class DnsRecordHistoryService {
                         "Tạo DNS Record mới"
                 );
 
-
-        // CREATE không có BEFORE
-
         setAfter(
                 history,
                 record
         );
 
-
-        historyRepository.save(
-                history
-        );
+        historyRepository.save(history);
     }
 
-
-    // 
-    // UPDATE
-    // 
+    // =====================================================
+    // 3. LOG UPDATE
+    //
+    // UPDATE:
+    // before = trạng thái cũ
+    // after  = trạng thái mới
+    // =====================================================
 
     public void logUpdate(
             DnsRecord before,
             DnsRecord after) {
+
+        validateRecord(before);
+        validateRecord(after);
 
         DnsRecordHistory history =
                 baseHistory(
@@ -99,32 +95,33 @@ public class DnsRecordHistoryService {
                         "Cập nhật DNS Record"
                 );
 
-
         setBefore(
                 history,
                 before
         );
-
 
         setAfter(
                 history,
                 after
         );
 
-
-        historyRepository.save(
-                history
-        );
+        historyRepository.save(history);
     }
 
-
-    // 
-    // DELETE
-    // 
+    // =====================================================
+    // 4. LOG DELETE
+    //
+    // DELETE:
+    // before = trạng thái trước khi xóa mềm
+    // after  = trạng thái DELETED
+    // =====================================================
 
     public void logDelete(
             DnsRecord before,
             DnsRecord after) {
+
+        validateRecord(before);
+        validateRecord(after);
 
         DnsRecordHistory history =
                 baseHistory(
@@ -133,69 +130,86 @@ public class DnsRecordHistoryService {
                         "Xóa mềm DNS Record"
                 );
 
-
         setBefore(
                 history,
                 before
         );
-
 
         setAfter(
                 history,
                 after
         );
 
-
-        historyRepository.save(
-                history
-        );
+        historyRepository.save(history);
     }
 
-
-    // 
-    // BASE
-    // 
+    // =====================================================
+    // 5. BASE HISTORY
+    //
+    // Các field dùng chung cho CREATE / UPDATE / DELETE
+    // =====================================================
 
     private DnsRecordHistory baseHistory(
             DnsRecord record,
-            String action,
+            String actionType,
             String description) {
+
+        validateRecord(record);
+
+        if (record.getDomain() == null
+                || record.getDomain().getId() == null) {
+
+            throw new IllegalArgumentException(
+                    "DNS Record History bắt buộc phải có Domain."
+            );
+        }
 
         DnsRecordHistory history =
                 new DnsRecordHistory();
-
 
         history.setDnsRecordId(
                 record.getId()
         );
 
-
         history.setDomainId(
                 record.getDomain().getId()
         );
 
-
         history.setActionType(
-                action
+                actionType
         );
-
 
         history.setDescription(
                 description
         );
 
+        /*
+         * Nếu entity DnsRecordHistory của bạn
+         * có @PrePersist để tự set changedAt
+         * thì có thể bỏ dòng này.
+         *
+         * Nếu không có thì giữ lại.
+         */
+        history.setChangedAt(
+                LocalDateTime.now()
+        );
 
         return history;
     }
 
-
-    // 
-    // BEFORE
-    // 
+    // =====================================================
+    // 6. SET BEFORE SNAPSHOT
+    // =====================================================
 
     private void setBefore(
             DnsRecordHistory history,
             DnsRecord record) {
+
+        if (history == null
+                || record == null) {
+
+            return;
+        }
 
         history.setBeforeHostname(
                 record.getHostname()
@@ -218,14 +232,19 @@ public class DnsRecordHistoryService {
         );
     }
 
-
-    // 
-    // AFTER
-    // 
+    // =====================================================
+    // 7. SET AFTER SNAPSHOT
+    // =====================================================
 
     private void setAfter(
             DnsRecordHistory history,
             DnsRecord record) {
+
+        if (history == null
+                || record == null) {
+
+            return;
+        }
 
         history.setAfterHostname(
                 record.getHostname()
@@ -248,17 +267,55 @@ public class DnsRecordHistoryService {
         );
     }
 
-
-    // 
-    // RECENT CHANGES
-    // 
+    // =====================================================
+    // 8. COUNT RECENT CHANGES
+    //
+    // Dashboard:
+    // số thay đổi trong 7 ngày gần nhất
+    // =====================================================
 
     public long countRecentChanges() {
 
+        LocalDateTime sevenDaysAgo =
+                LocalDateTime.now()
+                        .minusDays(7);
+
         return historyRepository
                 .countByChangedAtAfter(
-                        LocalDateTime.now()
-                                .minusDays(7)
+                        sevenDaysAgo
                 );
+    }
+
+    // =====================================================
+    // 9. NORMALIZE ACTION TYPE
+    // =====================================================
+
+    private String normalizeActionType(
+            String actionType) {
+
+        if (actionType == null
+                || actionType.isBlank()) {
+
+            return null;
+        }
+
+        return actionType
+                .trim()
+                .toUpperCase();
+    }
+
+    // =====================================================
+    // 10. VALIDATE RECORD
+    // =====================================================
+
+    private void validateRecord(
+            DnsRecord record) {
+
+        if (record == null) {
+
+            throw new IllegalArgumentException(
+                    "DNS Record không được null khi ghi History."
+            );
+        }
     }
 }
