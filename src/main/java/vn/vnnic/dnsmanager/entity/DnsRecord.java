@@ -14,7 +14,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
-
+//JPA/Hibernate ánh xạ Java class sang bảng trong database.
 @Entity
 @Table(
         name = "dns_record",

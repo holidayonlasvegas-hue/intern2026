@@ -12,7 +12,7 @@ import vn.vnnic.dnsmanager.entity.DnsRecord;
 import vn.vnnic.dnsmanager.entity.Domain;
 import vn.vnnic.dnsmanager.repository.DnsRecordRepository;
 import vn.vnnic.dnsmanager.validation.DnsRecordValidator;
-
+//cài, tìm hiểu lombook, tìm hieur cách viết log, log mức từ info trở lên,...
 @Service
 public class DnsRecordService {
 
@@ -228,7 +228,7 @@ public class DnsRecordService {
 
             throw new IllegalArgumentException(
                     "DNS Record đã tồn tại."
-            );
+            );//chủ động tạo ra và ném 1 exception
         }
 
         // -------------------------------------------------
@@ -498,7 +498,7 @@ public class DnsRecordService {
     // 9. HARD DELETE DNS RECORD
     // =====================================================
 
-    @Transactional
+    @Transactional//gom nhiều thao tác với database thành 1 transaction 
     public void hardDeleteRecord(
             Long id) {
 

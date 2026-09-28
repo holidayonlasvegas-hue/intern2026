@@ -1,142 +1,132 @@
-2026-08-27 02:25:39 WARN  [HikariPool-10:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-10 - Thread starvation or clock leap detected (housekeeper delta=5h30m28s853ms366µs).
-2026-08-27 03:14:17 WARN  [HikariPool-10:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-10 - Thread starvation or clock leap detected (housekeeper delta=48m43s248ms845µs100ns).
-2026-08-27 03:17:17 INFO  [File Watcher] o.s.b.d.a.LocalDevToolsAutoConfiguration$RestartingClassPathChangeChangedEventListener - Restarting due to 1 class path change (0 additions, 0 deletions, 1 modification)
-2026-08-27 03:17:17 INFO  [Thread-33] o.s.boot.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
-2026-08-27 03:17:17 INFO  [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown - Graceful shutdown complete
-2026-08-27 03:17:17 INFO  [Thread-33] o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
-2026-08-27 03:17:17 INFO  [Thread-33] com.zaxxer.hikari.HikariDataSource - HikariPool-10 - Shutdown initiated...
-2026-08-27 03:17:17 INFO  [Thread-33] com.zaxxer.hikari.HikariDataSource - HikariPool-10 - Shutdown completed.
-2026-08-27 03:17:18 INFO  [restartedMain] v.v.d.VnnicDnsManagerApplication - Starting VnnicDnsManagerApplication using Java 21.0.7 with PID 27896 (C:\Users\Admin\eclipse-workspace\vnnic-dns-manager\target\classes started by Admin in C:\Users\Admin\eclipse-workspace\vnnic-dns-manager)
-2026-08-27 03:17:18 INFO  [restartedMain] v.v.d.VnnicDnsManagerApplication - No active profile set, falling back to 1 default profile: "default"
-2026-08-27 03:17:18 INFO  [restartedMain] o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2026-08-27 03:17:18 INFO  [restartedMain] o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 42 ms. Found 3 JPA repository interfaces.
-2026-08-27 03:17:19 INFO  [restartedMain] o.s.boot.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
-2026-08-27 03:17:19 INFO  [restartedMain] o.a.catalina.core.StandardService - Starting service [Tomcat]
-2026-08-27 03:17:19 INFO  [restartedMain] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.22]
-2026-08-27 03:17:19 INFO  [restartedMain] o.s.b.w.c.s.WebApplicationContextInitializer - Root WebApplicationContext: initialization completed in 1295 ms
-2026-08-27 03:17:19 INFO  [restartedMain] org.hibernate.orm.jpa - HHH008540: Processing PersistenceUnitInfo [name: default]
-2026-08-27 03:17:19 INFO  [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
-2026-08-27 03:17:19 INFO  [restartedMain] com.zaxxer.hikari.HikariDataSource - HikariPool-11 - Starting...
-2026-08-27 03:17:19 INFO  [restartedMain] com.zaxxer.hikari.pool.HikariPool - HikariPool-11 - Added connection com.mysql.cj.jdbc.ConnectionImpl@7b629843
-2026-08-27 03:17:19 INFO  [restartedMain] com.zaxxer.hikari.HikariDataSource - HikariPool-11 - Start completed.
-2026-08-27 03:17:19 INFO  [restartedMain] o.hibernate.orm.connections.pooling - HHH10001005: Database info:
-	Database JDBC URL [jdbc:mysql://localhost:3306/vnnic_dns_manager]
-	Database driver: MySQL Connector/J
-	Database dialect: MySQLDialect
-	Database version: 8.4.7
-	Default catalog/schema: vnnic_dns_manager/undefined
-	Autocommit mode: undefined/unknown
-	Isolation level: REPEATABLE_READ [default REPEATABLE_READ]
-	JDBC fetch size: none
-	Pool: DataSourceConnectionProvider
-	Minimum pool size: undefined/unknown
-	Maximum pool size: undefined/unknown
-2026-08-27 03:17:20 INFO  [restartedMain] org.hibernate.orm.core - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
-2026-08-27 03:17:20 WARN  [restartedMain] o.h.t.s.i.ExceptionHandlerLoggedImpl - GenerationTarget encountered exception accepting command : Error executing DDL "
-    create index idx_dns_record_value 
-       on dns_record (record_value)" via JDBC [Specified key was too long; max key length is 3072 bytes]
-org.hibernate.tool.schema.spi.CommandAcceptanceException: Error executing DDL "
-    create index idx_dns_record_value 
-       on dns_record (record_value)" via JDBC [Specified key was too long; max key length is 3072 bytes]
-	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:91) ~[hibernate-core-7.4.1.Final.jar:7.4.1.Final]
-	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlString(AbstractSchemaMigrator.java:566) ~[hibernate-core-7.4.1.Final.jar:7.4.1.Final]
-	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlStrings(AbstractSchemaMigrator.java:506) ~[hibernate-core-7.4.1.Final.jar:7.4.1.Final]
-	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applyIndexes(AbstractSchemaMigrator.java:351) ~[hibernate-core-7.4.1.Final.jar:7.4.1.Final]
-	at org.hibernate.tool.schema.internal.GroupedSchemaMigratorImpl.performTablesMigration(GroupedSchemaMigratorImpl.java:96) ~[hibernate-core-7.4.1.Final.jar:7.4.1.Final]
-	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.performMigration(AbstractSchemaMigrator.java:220) ~[hibernate-core-7.4.1.Final.jar:7.4.1.Final]
-	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.doMigration(AbstractSchemaMigrator.java:96) ~[hibernate-core-7.4.1.Final.jar:7.4.1.Final]
-	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.performDatabaseAction(SchemaManagementToolCoordinator.java:269) ~[hibernate-core-7.4.1.Final.jar:7.4.1.Final]
-	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.lambda$process$1(SchemaManagementToolCoordinator.java:101) ~[hibernate-core-7.4.1.Final.jar:7.4.1.Final]
-	at java.base/java.util.HashMap.forEach(HashMap.java:1429) ~[na:na]
-	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.process(SchemaManagementToolCoordinator.java:100) ~[hibernate-core-7.4.1.Final.jar:7.4.1.Final]
-	at org.hibernate.boot.internal.SessionFactoryObserverForSchemaExport.sessionFactoryCreated(SessionFactoryObserverForSchemaExport.java:35) ~[hibernate-core-7.4.1.Final.jar:7.4.1.Final]
-	at org.hibernate.internal.SessionFactoryObserverChain.sessionFactoryCreated(SessionFactoryObserverChain.java:33) ~[hibernate-core-7.4.1.Final.jar:7.4.1.Final]
-	at org.hibernate.internal.SessionFactoryImpl.<init>(SessionFactoryImpl.java:327) ~[hibernate-core-7.4.1.Final.jar:7.4.1.Final]
-	at org.hibernate.internal.SessionFactoryRegistry.instantiateSessionFactory(SessionFactoryRegistry.java:64) ~[hibernate-core-7.4.1.Final.jar:7.4.1.Final]
-	at org.hibernate.boot.internal.SessionFactoryBuilderImpl.build(SessionFactoryBuilderImpl.java:458) ~[hibernate-core-7.4.1.Final.jar:7.4.1.Final]
-	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1452) ~[hibernate-core-7.4.1.Final.jar:7.4.1.Final]
-	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:93) ~[spring-orm-7.0.8.jar:7.0.8]
-	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:443) ~[spring-orm-7.0.8.jar:7.0.8]
-	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:436) ~[spring-orm-7.0.8.jar:7.0.8]
-	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:411) ~[spring-orm-7.0.8.jar:7.0.8]
-	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:419) ~[spring-orm-7.0.8.jar:7.0.8]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1862) ~[spring-beans-7.0.8.jar:7.0.8]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1811) ~[spring-beans-7.0.8.jar:7.0.8]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:603) ~[spring-beans-7.0.8.jar:7.0.8]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:525) ~[spring-beans-7.0.8.jar:7.0.8]
-	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:333) ~[spring-beans-7.0.8.jar:7.0.8]
-	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:371) ~[spring-beans-7.0.8.jar:7.0.8]
-	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:331) ~[spring-beans-7.0.8.jar:7.0.8]
-	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:201) ~[spring-beans-7.0.8.jar:7.0.8]
-	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:977) ~[spring-context-7.0.8.jar:7.0.8]
-	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:621) ~[spring-context-7.0.8.jar:7.0.8]
-	at org.springframework.boot.web.server.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:143) ~[spring-boot-web-server-4.1.0.jar:4.1.0]
-	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:756) ~[spring-boot-4.1.0.jar:4.1.0]
-	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:445) ~[spring-boot-4.1.0.jar:4.1.0]
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:321) ~[spring-boot-4.1.0.jar:4.1.0]
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1365) ~[spring-boot-4.1.0.jar:4.1.0]
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1354) ~[spring-boot-4.1.0.jar:4.1.0]
-	at vn.vnnic.dnsmanager.VnnicDnsManagerApplication.main(VnnicDnsManagerApplication.java:10) ~[classes/:na]
-	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
-	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
-	at org.springframework.boot.devtools.restart.RestartLauncher.run(RestartLauncher.java:52) ~[spring-boot-devtools-4.1.0.jar:4.1.0]
-Caused by: java.sql.SQLSyntaxErrorException: Specified key was too long; max key length is 3072 bytes
-	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:112) ~[mysql-connector-j-9.7.0.jar:9.7.0]
-	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:114) ~[mysql-connector-j-9.7.0.jar:9.7.0]
-	at com.mysql.cj.jdbc.StatementImpl.executeInternal(StatementImpl.java:839) ~[mysql-connector-j-9.7.0.jar:9.7.0]
-	at com.mysql.cj.jdbc.StatementImpl.execute(StatementImpl.java:687) ~[mysql-connector-j-9.7.0.jar:9.7.0]
-	at com.zaxxer.hikari.pool.ProxyStatement.execute(ProxyStatement.java:95) ~[HikariCP-7.0.2.jar:na]
-	at com.zaxxer.hikari.pool.HikariProxyStatement.execute(HikariProxyStatement.java) ~[HikariCP-7.0.2.jar:na]
-	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:86) ~[hibernate-core-7.4.1.Final.jar:7.4.1.Final]
-	... 41 common frames omitted
-2026-08-27 03:17:20 INFO  [restartedMain] o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
-2026-08-27 03:17:20 WARN  [restartedMain] o.s.b.w.s.s.c.AnnotationConfigServletWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'dnsRecordController' defined in file [C:\Users\Admin\eclipse-workspace\vnnic-dns-manager\target\classes\vn\vnnic\dnsmanager\controller\DnsRecordController.class]: Failed to instantiate [vn.vnnic.dnsmanager.controller.DnsRecordController]: Constructor threw exception
-2026-08-27 03:17:20 INFO  [restartedMain] o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
-2026-08-27 03:17:20 INFO  [restartedMain] com.zaxxer.hikari.HikariDataSource - HikariPool-11 - Shutdown initiated...
-2026-08-27 03:17:20 INFO  [restartedMain] com.zaxxer.hikari.HikariDataSource - HikariPool-11 - Shutdown completed.
-2026-08-27 03:17:20 INFO  [restartedMain] o.a.catalina.core.StandardService - Stopping service [Tomcat]
-2026-08-27 03:17:20 INFO  [restartedMain] o.s.b.a.l.ConditionEvaluationReportLogger - 
-
-Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
-2026-08-27 03:17:20 ERROR [restartedMain] o.s.boot.SpringApplication - Application run failed
-org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'dnsRecordController' defined in file [C:\Users\Admin\eclipse-workspace\vnnic-dns-manager\target\classes\vn\vnnic\dnsmanager\controller\DnsRecordController.class]: Failed to instantiate [vn.vnnic.dnsmanager.controller.DnsRecordController]: Constructor threw exception
-	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:321) ~[spring-beans-7.0.8.jar:7.0.8]
-	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:309) ~[spring-beans-7.0.8.jar:7.0.8]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1380) ~[spring-beans-7.0.8.jar:7.0.8]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1219) ~[spring-beans-7.0.8.jar:7.0.8]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:565) ~[spring-beans-7.0.8.jar:7.0.8]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:525) ~[spring-beans-7.0.8.jar:7.0.8]
-	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:333) ~[spring-beans-7.0.8.jar:7.0.8]
-	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:371) ~[spring-beans-7.0.8.jar:7.0.8]
-	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:331) ~[spring-beans-7.0.8.jar:7.0.8]
-	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:196) ~[spring-beans-7.0.8.jar:7.0.8]
-	at org.springframework.beans.factory.support.DefaultListableBeanFactory.instantiateSingleton(DefaultListableBeanFactory.java:1225) ~[spring-beans-7.0.8.jar:7.0.8]
-	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingleton(DefaultListableBeanFactory.java:1191) ~[spring-beans-7.0.8.jar:7.0.8]
-	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:1121) ~[spring-beans-7.0.8.jar:7.0.8]
-	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:994) ~[spring-context-7.0.8.jar:7.0.8]
-	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:621) ~[spring-context-7.0.8.jar:7.0.8]
-	at org.springframework.boot.web.server.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:143) ~[spring-boot-web-server-4.1.0.jar:4.1.0]
-	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:756) ~[spring-boot-4.1.0.jar:4.1.0]
-	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:445) ~[spring-boot-4.1.0.jar:4.1.0]
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:321) ~[spring-boot-4.1.0.jar:4.1.0]
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1365) ~[spring-boot-4.1.0.jar:4.1.0]
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1354) ~[spring-boot-4.1.0.jar:4.1.0]
-	at vn.vnnic.dnsmanager.VnnicDnsManagerApplication.main(VnnicDnsManagerApplication.java:10) ~[classes/:na]
-	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
-	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
-	at org.springframework.boot.devtools.restart.RestartLauncher.run(RestartLauncher.java:52) ~[spring-boot-devtools-4.1.0.jar:4.1.0]
-Caused by: org.springframework.beans.BeanInstantiationException: Failed to instantiate [vn.vnnic.dnsmanager.controller.DnsRecordController]: Constructor threw exception
-	at org.springframework.beans.BeanUtils.instantiateClass(BeanUtils.java:220) ~[spring-beans-7.0.8.jar:7.0.8]
-	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:129) ~[spring-beans-7.0.8.jar:7.0.8]
-	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:318) ~[spring-beans-7.0.8.jar:7.0.8]
-	... 24 common frames omitted
-Caused by: java.lang.Error: Unresolved compilation problems: 
-	The method softDeleteRecord(Long) is undefined for the type DnsRecordService
-	Syntax error, insert "}" to complete ClassBody
-
-	at vn.vnnic.dnsmanager.controller.DnsRecordController.<init>(DnsRecordController.java:216) ~[classes/:na]
-	at java.base/jdk.internal.reflect.DirectConstructorHandleAccessor.newInstance(DirectConstructorHandleAccessor.java:62) ~[na:na]
-	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:502) ~[na:na]
-	at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:486) ~[na:na]
-	at org.springframework.beans.BeanUtils.instantiateClass(BeanUtils.java:207) ~[spring-beans-7.0.8.jar:7.0.8]
-	... 26 common frames omitted
+2026-09-10 16:01:59 WARN  [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Thread starvation or clock leap detected (housekeeper delta=6d3h21m44s10ms964µs500ns).
+2026-09-10 16:01:59 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Pool stats (total=10/10, idle=10/10, active=0, waiting=0)
+2026-09-10 16:01:59 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Fill pool skipped, pool has sufficient level or currently being filled.
+2026-09-10 16:01:59 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@776bcb7 is alive
+2026-09-10 16:01:59 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@122a3d32 is alive
+2026-09-10 16:01:59 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@4e0e9c13 is alive
+2026-09-10 16:01:59 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@23433a4e is alive
+2026-09-10 16:01:59 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@23ccccfd is alive
+2026-09-10 16:01:59 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@1ff14e8b is alive
+2026-09-10 16:01:59 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@47227ac4 is alive
+2026-09-10 16:01:59 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@627e3075 is alive
+2026-09-10 16:01:59 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@436cc501 is alive
+2026-09-10 16:01:59 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@2e92dbbe is alive
+2026-09-10 16:01:59 DEBUG [HikariPool-29:connection-closer] com.zaxxer.hikari.pool.PoolBase - HikariPool-29 - Closing connection com.mysql.cj.jdbc.ConnectionImpl@776bcb7: (connection has passed maxLifetime)
+2026-09-10 16:01:59 DEBUG [HikariPool-29:connection-closer] com.zaxxer.hikari.pool.PoolBase - HikariPool-29 - Closing connection com.mysql.cj.jdbc.ConnectionImpl@627e3075: (connection has passed maxLifetime)
+2026-09-10 16:01:59 DEBUG [HikariPool-29:connection-closer] com.zaxxer.hikari.pool.PoolBase - HikariPool-29 - Closing connection com.mysql.cj.jdbc.ConnectionImpl@436cc501: (connection has passed maxLifetime)
+2026-09-10 16:01:59 DEBUG [HikariPool-29:connection-adder] com.zaxxer.hikari.pool.PoolBase - HikariPool-29 - Attempting to create/setup new connection (b5c6277e-03e8-4061-82ec-c7cd0027532f)
+2026-09-10 16:02:00 DEBUG [HikariPool-29:connection-closer] com.zaxxer.hikari.pool.PoolBase - HikariPool-29 - Closing connection com.mysql.cj.jdbc.ConnectionImpl@4e0e9c13: (connection has passed maxLifetime)
+2026-09-10 16:02:00 DEBUG [HikariPool-29:connection-closer] com.zaxxer.hikari.pool.PoolBase - HikariPool-29 - Closing connection com.mysql.cj.jdbc.ConnectionImpl@23433a4e: (connection has passed maxLifetime)
+2026-09-10 16:02:00 DEBUG [HikariPool-29:connection-closer] com.zaxxer.hikari.pool.PoolBase - HikariPool-29 - Closing connection com.mysql.cj.jdbc.ConnectionImpl@23ccccfd: (connection has passed maxLifetime)
+2026-09-10 16:02:00 DEBUG [HikariPool-29:connection-closer] com.zaxxer.hikari.pool.PoolBase - HikariPool-29 - Closing connection com.mysql.cj.jdbc.ConnectionImpl@47227ac4: (connection has passed maxLifetime)
+2026-09-10 16:02:00 DEBUG [HikariPool-29:connection-closer] com.zaxxer.hikari.pool.PoolBase - HikariPool-29 - Closing connection com.mysql.cj.jdbc.ConnectionImpl@1ff14e8b: (connection has passed maxLifetime)
+2026-09-10 16:02:00 DEBUG [HikariPool-29:connection-closer] com.zaxxer.hikari.pool.PoolBase - HikariPool-29 - Closing connection com.mysql.cj.jdbc.ConnectionImpl@2e92dbbe: (connection has passed maxLifetime)
+2026-09-10 16:02:00 DEBUG [HikariPool-29:connection-closer] com.zaxxer.hikari.pool.PoolBase - HikariPool-29 - Closing connection com.mysql.cj.jdbc.ConnectionImpl@122a3d32: (connection has passed maxLifetime)
+2026-09-10 16:02:00 DEBUG [HikariPool-29:connection-adder] com.zaxxer.hikari.pool.PoolBase - HikariPool-29 - Established new connection (b5c6277e-03e8-4061-82ec-c7cd0027532f)
+2026-09-10 16:02:00 DEBUG [HikariPool-29:connection-adder] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Added connection com.mysql.cj.jdbc.ConnectionImpl@370e27b7
+2026-09-10 16:02:00 DEBUG [HikariPool-29:connection-adder] com.zaxxer.hikari.pool.PoolBase - HikariPool-29 - Attempting to create/setup new connection (f5ac0c57-9870-4d53-81bc-595c4dc257a5)
+2026-09-10 16:02:00 DEBUG [HikariPool-29:connection-adder] com.zaxxer.hikari.pool.PoolBase - HikariPool-29 - Established new connection (f5ac0c57-9870-4d53-81bc-595c4dc257a5)
+2026-09-10 16:02:00 DEBUG [HikariPool-29:connection-adder] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Added connection com.mysql.cj.jdbc.ConnectionImpl@7d1345c0
+2026-09-10 16:02:00 DEBUG [HikariPool-29:connection-adder] com.zaxxer.hikari.pool.PoolBase - HikariPool-29 - Attempting to create/setup new connection (6cab39bc-500d-44e9-8688-d2a89488388d)
+2026-09-10 16:02:00 DEBUG [HikariPool-29:connection-adder] com.zaxxer.hikari.pool.PoolBase - HikariPool-29 - Established new connection (6cab39bc-500d-44e9-8688-d2a89488388d)
+2026-09-10 16:02:00 DEBUG [HikariPool-29:connection-adder] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Added connection com.mysql.cj.jdbc.ConnectionImpl@5418ac8
+2026-09-10 16:02:00 DEBUG [HikariPool-29:connection-adder] com.zaxxer.hikari.pool.PoolBase - HikariPool-29 - Attempting to create/setup new connection (9255cd28-d1d6-4198-9d3d-293a799909fd)
+2026-09-10 16:02:00 DEBUG [HikariPool-29:connection-adder] com.zaxxer.hikari.pool.PoolBase - HikariPool-29 - Established new connection (9255cd28-d1d6-4198-9d3d-293a799909fd)
+2026-09-10 16:02:00 DEBUG [HikariPool-29:connection-adder] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Added connection com.mysql.cj.jdbc.ConnectionImpl@75f93abc
+2026-09-10 16:02:00 DEBUG [HikariPool-29:connection-adder] com.zaxxer.hikari.pool.PoolBase - HikariPool-29 - Attempting to create/setup new connection (660980ab-1371-423a-acc8-55bba41ed4b2)
+2026-09-10 16:02:00 DEBUG [HikariPool-29:connection-adder] com.zaxxer.hikari.pool.PoolBase - HikariPool-29 - Established new connection (660980ab-1371-423a-acc8-55bba41ed4b2)
+2026-09-10 16:02:00 DEBUG [HikariPool-29:connection-adder] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Added connection com.mysql.cj.jdbc.ConnectionImpl@1e45a5f2
+2026-09-10 16:02:00 DEBUG [HikariPool-29:connection-adder] com.zaxxer.hikari.pool.PoolBase - HikariPool-29 - Attempting to create/setup new connection (08a71ca5-b174-4040-9594-e5c063130e14)
+2026-09-10 16:02:00 DEBUG [HikariPool-29:connection-adder] com.zaxxer.hikari.pool.PoolBase - HikariPool-29 - Established new connection (08a71ca5-b174-4040-9594-e5c063130e14)
+2026-09-10 16:02:00 DEBUG [HikariPool-29:connection-adder] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Added connection com.mysql.cj.jdbc.ConnectionImpl@2a7dda44
+2026-09-10 16:02:00 DEBUG [HikariPool-29:connection-adder] com.zaxxer.hikari.pool.PoolBase - HikariPool-29 - Attempting to create/setup new connection (846fa3d1-ac74-441b-ac83-712b38dd4a2e)
+2026-09-10 16:02:00 DEBUG [HikariPool-29:connection-adder] com.zaxxer.hikari.pool.PoolBase - HikariPool-29 - Established new connection (846fa3d1-ac74-441b-ac83-712b38dd4a2e)
+2026-09-10 16:02:00 DEBUG [HikariPool-29:connection-adder] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Added connection com.mysql.cj.jdbc.ConnectionImpl@5563b532
+2026-09-10 16:02:00 DEBUG [HikariPool-29:connection-adder] com.zaxxer.hikari.pool.PoolBase - HikariPool-29 - Attempting to create/setup new connection (975e5d63-53b5-48cf-a26c-5568367aa9ea)
+2026-09-10 16:02:00 DEBUG [HikariPool-29:connection-adder] com.zaxxer.hikari.pool.PoolBase - HikariPool-29 - Established new connection (975e5d63-53b5-48cf-a26c-5568367aa9ea)
+2026-09-10 16:02:00 DEBUG [HikariPool-29:connection-adder] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Added connection com.mysql.cj.jdbc.ConnectionImpl@6eed23c9
+2026-09-10 16:02:00 DEBUG [HikariPool-29:connection-adder] com.zaxxer.hikari.pool.PoolBase - HikariPool-29 - Attempting to create/setup new connection (ab58b8e6-4e2c-4ee7-90b9-096fa97cd903)
+2026-09-10 16:02:00 DEBUG [HikariPool-29:connection-adder] com.zaxxer.hikari.pool.PoolBase - HikariPool-29 - Established new connection (ab58b8e6-4e2c-4ee7-90b9-096fa97cd903)
+2026-09-10 16:02:00 DEBUG [HikariPool-29:connection-adder] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Added connection com.mysql.cj.jdbc.ConnectionImpl@17d5a72d
+2026-09-10 16:02:00 DEBUG [HikariPool-29:connection-adder] com.zaxxer.hikari.pool.PoolBase - HikariPool-29 - Attempting to create/setup new connection (ef2077e3-9f79-4ecf-b4a1-78fb87b46d48)
+2026-09-10 16:02:01 DEBUG [HikariPool-29:connection-adder] com.zaxxer.hikari.pool.PoolBase - HikariPool-29 - Established new connection (ef2077e3-9f79-4ecf-b4a1-78fb87b46d48)
+2026-09-10 16:02:01 DEBUG [HikariPool-29:connection-adder] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Added connection com.mysql.cj.jdbc.ConnectionImpl@9a76843
+2026-09-10 16:02:01 DEBUG [HikariPool-29:connection-adder] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Connection not added, stats (total=10/10, idle=10/10, active=0, waiting=0)
+2026-09-10 16:02:29 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Pool stats (total=10/10, idle=10/10, active=0, waiting=0)
+2026-09-10 16:02:29 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Fill pool skipped, pool has sufficient level or currently being filled.
+2026-09-10 16:02:51 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Pool stats (total=10/10, idle=10/10, active=0, waiting=0)
+2026-09-10 16:02:51 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Fill pool skipped, pool has sufficient level or currently being filled.
+2026-09-10 16:03:21 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Pool stats (total=10/10, idle=10/10, active=0, waiting=0)
+2026-09-10 16:03:21 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Fill pool skipped, pool has sufficient level or currently being filled.
+2026-09-10 16:03:30 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@1e45a5f2 is alive
+2026-09-10 16:03:30 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@6eed23c9 is alive
+2026-09-10 16:03:30 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@2a7dda44 is alive
+2026-09-10 16:03:33 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@17d5a72d is alive
+2026-09-10 16:03:34 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@75f93abc is alive
+2026-09-10 16:03:35 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@370e27b7 is alive
+2026-09-10 16:03:36 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@9a76843 is alive
+2026-09-10 16:03:44 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@5563b532 is alive
+2026-09-10 16:03:46 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@7d1345c0 is alive
+2026-09-10 16:03:48 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@5418ac8 is alive
+2026-09-10 16:03:51 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Pool stats (total=10/10, idle=10/10, active=0, waiting=0)
+2026-09-10 16:03:51 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Fill pool skipped, pool has sufficient level or currently being filled.
+2026-09-10 16:04:21 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Pool stats (total=10/10, idle=10/10, active=0, waiting=0)
+2026-09-10 16:04:21 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Fill pool skipped, pool has sufficient level or currently being filled.
+2026-09-10 16:04:51 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Pool stats (total=10/10, idle=10/10, active=0, waiting=0)
+2026-09-10 16:04:51 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Fill pool skipped, pool has sufficient level or currently being filled.
+2026-09-10 16:05:07 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@6eed23c9 is alive
+2026-09-10 16:05:08 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@1e45a5f2 is alive
+2026-09-10 16:05:09 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@2a7dda44 is alive
+2026-09-10 16:05:14 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@17d5a72d is alive
+2026-09-10 16:05:17 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@75f93abc is alive
+2026-09-10 16:05:17 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@370e27b7 is alive
+2026-09-10 16:05:20 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@9a76843 is alive
+2026-09-10 16:05:21 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Pool stats (total=10/10, idle=10/10, active=0, waiting=0)
+2026-09-10 16:05:21 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Fill pool skipped, pool has sufficient level or currently being filled.
+2026-09-10 16:05:37 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@5563b532 is alive
+2026-09-10 16:05:41 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@7d1345c0 is alive
+2026-09-10 16:05:43 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@5418ac8 is alive
+2026-09-10 16:05:51 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Pool stats (total=10/10, idle=10/10, active=0, waiting=0)
+2026-09-10 16:05:51 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Fill pool skipped, pool has sufficient level or currently being filled.
+2026-09-10 16:06:21 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Pool stats (total=10/10, idle=10/10, active=0, waiting=0)
+2026-09-10 16:06:21 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Fill pool skipped, pool has sufficient level or currently being filled.
+2026-09-10 16:06:45 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@6eed23c9 is alive
+2026-09-10 16:06:45 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@1e45a5f2 is alive
+2026-09-10 16:06:47 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@2a7dda44 is alive
+2026-09-10 16:06:51 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Pool stats (total=10/10, idle=10/10, active=0, waiting=0)
+2026-09-10 16:06:51 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Fill pool skipped, pool has sufficient level or currently being filled.
+2026-09-10 16:06:55 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@17d5a72d is alive
+2026-09-10 16:06:59 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@75f93abc is alive
+2026-09-10 16:07:00 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@370e27b7 is alive
+2026-09-10 16:07:04 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@9a76843 is alive
+2026-09-10 16:07:21 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Pool stats (total=10/10, idle=10/10, active=0, waiting=0)
+2026-09-10 16:07:21 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Fill pool skipped, pool has sufficient level or currently being filled.
+2026-09-10 16:07:29 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@5563b532 is alive
+2026-09-10 16:07:35 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@7d1345c0 is alive
+2026-09-10 16:07:39 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@5418ac8 is alive
+2026-09-10 16:07:51 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Pool stats (total=10/10, idle=10/10, active=0, waiting=0)
+2026-09-10 16:07:51 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Fill pool skipped, pool has sufficient level or currently being filled.
+2026-09-10 16:08:21 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Pool stats (total=10/10, idle=10/10, active=0, waiting=0)
+2026-09-10 16:08:21 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Fill pool skipped, pool has sufficient level or currently being filled.
+2026-09-10 16:08:23 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@6eed23c9 is alive
+2026-09-10 16:08:23 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@1e45a5f2 is alive
+2026-09-10 16:08:25 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@2a7dda44 is alive
+2026-09-10 16:08:36 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@17d5a72d is alive
+2026-09-10 16:08:42 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@75f93abc is alive
+2026-09-10 16:08:43 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@370e27b7 is alive
+2026-09-10 16:08:47 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@9a76843 is alive
+2026-09-10 16:08:51 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Pool stats (total=10/10, idle=10/10, active=0, waiting=0)
+2026-09-10 16:08:51 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Fill pool skipped, pool has sufficient level or currently being filled.
+2026-09-10 16:09:21 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@5563b532 is alive
+2026-09-10 16:09:21 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Pool stats (total=10/10, idle=10/10, active=0, waiting=0)
+2026-09-10 16:09:21 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Fill pool skipped, pool has sufficient level or currently being filled.
+2026-09-10 16:09:29 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@7d1345c0 is alive
+2026-09-10 16:09:34 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@5418ac8 is alive
+2026-09-10 16:09:51 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Pool stats (total=10/10, idle=10/10, active=0, waiting=0)
+2026-09-10 16:09:51 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Fill pool skipped, pool has sufficient level or currently being filled.
+2026-09-10 16:10:00 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@6eed23c9 is alive
+2026-09-10 16:10:01 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@1e45a5f2 is alive
+2026-09-10 16:10:03 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@2a7dda44 is alive
+2026-09-10 16:10:17 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - keepalive: connection com.mysql.cj.jdbc.ConnectionImpl@17d5a72d is alive
+2026-09-10 16:10:21 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Pool stats (total=10/10, idle=10/10, active=0, waiting=0)
+2026-09-10 16:10:21 DEBUG [HikariPool-29:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-29 - Fill pool skipped, pool has sufficient level or currently being filled.

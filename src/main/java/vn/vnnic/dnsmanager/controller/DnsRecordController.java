@@ -15,15 +15,16 @@ import vn.vnnic.dnsmanager.entity.Domain;
 import vn.vnnic.dnsmanager.service.DnsRecordService;
 import vn.vnnic.dnsmanager.service.DomainService;
 
-@Controller
+
+@Controller//class này nhận/xử lý request web.
 public class DnsRecordController {
 
     private final DnsRecordService dnsRecordService;
     private final DomainService domainService;
 
-    // =====================================================
+   
     // CONSTRUCTOR
-    // =====================================================
+   
 
     public DnsRecordController(
             DnsRecordService dnsRecordService,
@@ -42,7 +43,7 @@ public class DnsRecordController {
     // - lọc theo record type
     // =====================================================
 
-    @GetMapping("/records")
+    @GetMapping("/records") //nghĩa là method ngay bên dưới sẽ xử lý HTTP GET request tới /records.
     public String records(
             @RequestParam(required = false) Long domainId,
             @RequestParam(required = false) String keyword,
@@ -91,13 +92,13 @@ public class DnsRecordController {
         } catch (IllegalArgumentException
                 | IllegalStateException e) {
 
-            /*
+            /*//try - catch dùng để bắt và xử lí lỗi khi chương trình đang chạy
              * Hiển thị lỗi ngay trên records.html.
              */
             model.addAttribute(
                     "errorMessage",
                     e.getMessage()
-            );
+            );//đưa thông báo lỗi từ Controller sang giao diện Thymeleaf.
 
             /*
              * Giữ dữ liệu người dùng vừa nhập
@@ -118,7 +119,7 @@ public class DnsRecordController {
             return "records";
         }
     }
-
+//là gọi method loadRecordsPage() để nạp lại dữ liệu cần thiết cho trang DNS Record.
     // =====================================================
     // 3. XEM CHI TIẾT DNS RECORD
     // =====================================================
@@ -245,7 +246,7 @@ public class DnsRecordController {
 
         } catch (IllegalArgumentException
                 | IllegalStateException e) {
-
+//Thử thực hiện việc xóa DNS Record. Nếu có lỗi thuộc các loại được catch bên dưới thì chuyển sang catch để xử lý.
             model.addAttribute(
                     "errorMessage",
                     e.getMessage()

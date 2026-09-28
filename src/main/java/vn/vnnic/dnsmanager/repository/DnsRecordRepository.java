@@ -13,50 +13,50 @@ import vn.vnnic.dnsmanager.entity.DnsRecord;
 public interface DnsRecordRepository
         extends JpaRepository<DnsRecord, Long> {
 
-    // =====================================================
+   
     // 1. GET ALL RECORDS BY DOMAIN
-    // =====================================================
+   
 
     List<DnsRecord> findByDomainId(
             Long domainId
     );
 
-    // =====================================================
+    
     // 2. GET RECORDS BY DOMAIN + STATUS
-    // =====================================================
+    
 
     List<DnsRecord> findByDomainIdAndStatus(
             Long domainId,
             String status
     );
 
-    // =====================================================
+    
     // 3. COUNT RECORDS BY DOMAIN + STATUS
-    // =====================================================
+    
 
     long countByDomainIdAndStatus(
             Long domainId,
             String status
     );
 
-    // =====================================================
+   
     // 4. CHECK WHETHER DOMAIN STILL HAS RECORDS
-    // =====================================================
+    
 
     boolean existsByDomainId(
             Long domainId
     );
 
-    // =====================================================
+    
     // 5. DASHBOARD
     // Count ACTIVE + INACTIVE, exclude DELETED
-    // =====================================================
+    
 
     long countByStatusNot(
             String status
     );
 
-    // =====================================================
+   
     // 6. SEARCH + FILTER
     //
     // Search by:
@@ -64,7 +64,7 @@ public interface DnsRecordRepository
     // - hostname
     // - record value
     // - record type
-    // =====================================================
+   
 
     @Query("""
         SELECT r
@@ -102,7 +102,7 @@ public interface DnsRecordRepository
             String recordType
     );
 
-    // =====================================================
+    
     // 7. DUPLICATE CHECK - CREATE
     //
     // Duplicate key:
@@ -111,7 +111,7 @@ public interface DnsRecordRepository
     // + hostname
     // + record_type
     // + record_value
-    // =====================================================
+    
 
     boolean existsByDomainIdAndHostnameAndRecordTypeAndRecordValue(
             Long domainId,
@@ -120,7 +120,7 @@ public interface DnsRecordRepository
             String recordValue
     );
 
-    // =====================================================
+   
     // 8. DUPLICATE CHECK - UPDATE
     //
     // Same duplicate rule as CREATE,
@@ -133,7 +133,7 @@ public interface DnsRecordRepository
     //
     // Updating record 10 without changing these values
     // must NOT be considered a duplicate of itself.
-    // =====================================================
+    
 
     boolean existsByDomainIdAndHostnameAndRecordTypeAndRecordValueAndIdNot(
             Long domainId,

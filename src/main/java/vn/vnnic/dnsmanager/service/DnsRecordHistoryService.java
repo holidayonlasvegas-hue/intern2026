@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import vn.vnnic.dnsmanager.entity.DnsRecord;
 import vn.vnnic.dnsmanager.entity.DnsRecordHistory;
 import vn.vnnic.dnsmanager.repository.DnsRecordHistoryRepository;
-
+//tạo và quản lí
 @Service
 public class DnsRecordHistoryService {
 

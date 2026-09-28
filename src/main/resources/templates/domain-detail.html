@@ -555,17 +555,7 @@
                                 <div th:if="${domain.status == 'ACTIVE'}">
 
 
-                                    <button type="button"
-                                            class="btn btn-warning btn-block mb-2"
-                                            data-toggle="modal"
-                                            data-target="#editDomainModal">
-
-                                        <i class="fas fa-edit mr-1"></i>
-
-                                        Cập nhật tên miền
-
-                                    </button>
-
+                                
 
                                     <form th:action="@{/domains/{id}/deactivate(id=${domain.id})}"
                                           method="post">
@@ -592,7 +582,7 @@
 
                                             <i class="fas fa-trash mr-1"></i>
 
-                                            Xóa mềm
+                                            Xóa
 
                                         </button>
 
@@ -622,16 +612,7 @@
                                     </form>
 
 
-                                    <button type="button"
-                                            class="btn btn-warning btn-block mb-2"
-                                            data-toggle="modal"
-                                            data-target="#editDomainModal">
-
-                                        <i class="fas fa-edit mr-1"></i>
-
-                                        Cập nhật tên miền
-
-                                    </button>
+                                
 
 
                                     <form th:action="@{/domains/{id}/delete(id=${domain.id})}"
@@ -643,7 +624,8 @@
 
                                             <i class="fas fa-trash mr-1"></i>
 
-                                            Xóa mềm
+                                           Xóa
+                                          
 
                                         </button>
 
@@ -662,7 +644,7 @@
 
                                         <i class="fas fa-trash mr-1"></i>
 
-                                        Tên miền đã bị xóa mềm.
+                                        Tên miền đã bị xóa.
 
                                     </div>
 

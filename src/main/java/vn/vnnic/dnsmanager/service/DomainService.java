@@ -9,46 +9,55 @@ import org.springframework.transaction.annotation.Transactional;
 import vn.vnnic.dnsmanager.entity.Domain;
 import vn.vnnic.dnsmanager.repository.DnsRecordRepository;
 import vn.vnnic.dnsmanager.repository.DomainRepository;
+import vn.vnnic.dnsmanager.validation.DomainValidation;
 
 @Service
 public class DomainService {
 
     private final DomainRepository domainRepository;
     private final DnsRecordRepository dnsRecordRepository;
+    private final DomainValidation domainValidation;
 
-
-    // 
+    // =====================================================
     // CONSTRUCTOR
-    // 
+    // =====================================================
 
     public DomainService(
             DomainRepository domainRepository,
-            DnsRecordRepository dnsRecordRepository) {
+            DnsRecordRepository dnsRecordRepository,
+            DomainValidation domainValidation) {
 
         this.domainRepository =
                 domainRepository;
 
         this.dnsRecordRepository =
                 dnsRecordRepository;
+
+        this.domainValidation =
+                domainValidation;
     }
 
-
-    // 
-    // GET ALL
-    // 
+    // =====================================================
+    // 1. GET ALL DOMAINS
+    // =====================================================
 
     public List<Domain> getAllDomains() {
 
         return domainRepository.findAll();
     }
 
-
-    // 
-    // GET BY ID
-    // 
+    // =====================================================
+    // 2. GET DOMAIN BY ID
+    // =====================================================
 
     public Domain getDomainById(
             Long id) {
+
+        if (id == null) {
+            throw new IllegalArgumentException(
+                    "ID tên miền không được để trống."
+            );
+        }
 
         return domainRepository
                 .findById(id)
@@ -60,42 +69,42 @@ public class DomainService {
                 );
     }
 
-
-    // 
-    // CREATE DOMAIN
-    // 
+    // =====================================================
+    // 3. CREATE DOMAIN
+    // =====================================================
 
     @Transactional
     public Domain createDomain(
             Domain domain) {
 
-
-        // ---------------------------------------------
-        // DOMAIN NAME BẮT BUỘC
-        // ---------------------------------------------
-
-        if (domain.getDomainName() == null
-                || domain.getDomainName().isBlank()) {
-
+        if (domain == null) {
             throw new IllegalArgumentException(
-                    "Tên miền không được để trống."
+                    "Domain không được để trống."
             );
         }
 
+        // -------------------------------------------------
+        // VALIDATE + NORMALIZE DOMAIN NAME
+        //
+        // Ví dụ:
+        //
+        // 123       -> INVALID
+        // abc       -> INVALID
+        // vnnic.vn  -> VALID
+        // VNNIC.VN  -> vnnic.vn
+        // 123.vn    -> VALID
+        // -------------------------------------------------
 
-        // ---------------------------------------------
-        // NORMALIZE
-        // ---------------------------------------------
+        domainValidation.validate(
+                domain
+        );
 
         String normalizedName =
-                normalizeDomainName(
-                        domain.getDomainName()
-                );
+                domain.getDomainName();
 
-
-        // ---------------------------------------------
+        // -------------------------------------------------
         // CHECK DUPLICATE
-        // ---------------------------------------------
+        // -------------------------------------------------
 
         if (domainRepository
                 .existsByDomainNameIgnoreCase(
@@ -108,15 +117,9 @@ public class DomainService {
             );
         }
 
-
-        domain.setDomainName(
-                normalizedName
-        );
-
-
-        // ---------------------------------------------
+        // -------------------------------------------------
         // STATUS
-        // ---------------------------------------------
+        // -------------------------------------------------
 
         if (domain.getStatus() == null
                 || domain.getStatus().isBlank()) {
@@ -134,9 +137,10 @@ public class DomainService {
             );
         }
 
-
-        // Không cho tạo mới thẳng ở trạng thái DELETED
-
+        /*
+         * Không cho người dùng tạo Domain mới
+         * ở trạng thái DELETED.
+         */
         if ("DELETED".equals(
                 domain.getStatus())) {
 
@@ -145,32 +149,66 @@ public class DomainService {
             );
         }
 
+        // -------------------------------------------------
+        // DESCRIPTION
+        // -------------------------------------------------
 
         normalizeDescription(
                 domain
         );
 
+        // -------------------------------------------------
+        // TIMESTAMP
+        // -------------------------------------------------
 
-        return domainRepository.save(
+        LocalDateTime now =
+                LocalDateTime.now();
+
+        /*
+         * Nếu Entity của bạn đã dùng @PrePersist
+         * thì việc set timestamp ở đây có thể bỏ.
+         *
+         * Nhưng set ở Service giúp business flow rõ ràng.
+         */
+        if (domain.getCreatedAt() == null) {
+            domain.setCreatedAt(now);
+        }
+
+        domain.setUpdatedAt(now);
+        domain.setDeletedAt(null);
+
+        // -------------------------------------------------
+        // SAVE
+        // -------------------------------------------------
+
+        return domainRepository.saveAndFlush(
                 domain
         );
     }
 
-
-    // 
-    // UPDATE DOMAIN
-    // 
+    // =====================================================
+    // 4. UPDATE DOMAIN
+    // =====================================================
 
     @Transactional
     public Domain updateDomain(
             Long id,
             Domain newDomain) {
 
+        if (newDomain == null) {
+            throw new IllegalArgumentException(
+                    "Dữ liệu cập nhật tên miền không được để trống."
+            );
+        }
+
         Domain current =
                 getDomainById(id);
 
+        // -------------------------------------------------
+        // DOMAIN DELETED KHÔNG ĐƯỢC UPDATE
+        // -------------------------------------------------
 
-        if ("DELETED".equals(
+        if ("DELETED".equalsIgnoreCase(
                 current.getStatus())) {
 
             throw new IllegalStateException(
@@ -178,31 +216,22 @@ public class DomainService {
             );
         }
 
+        // -------------------------------------------------
+        // VALIDATE + NORMALIZE DOMAIN NAME
+        // -------------------------------------------------
 
-        // ---------------------------------------------
-        // DOMAIN NAME
-        // ---------------------------------------------
-
-        if (newDomain.getDomainName() == null
-                || newDomain
-                        .getDomainName()
-                        .isBlank()) {
-
-            throw new IllegalArgumentException(
-                    "Tên miền không được để trống."
-            );
-        }
-
+        domainValidation.validate(
+                newDomain
+        );
 
         String normalizedName =
-                normalizeDomainName(
-                        newDomain.getDomainName()
-                );
+                newDomain.getDomainName();
 
-
-        // ---------------------------------------------
-        // UNIQUE - BỎ QUA CHÍNH DOMAIN HIỆN TẠI
-        // ---------------------------------------------
+        // -------------------------------------------------
+        // DUPLICATE CHECK
+        //
+        // Bỏ qua chính Domain đang update.
+        // -------------------------------------------------
 
         if (domainRepository
                 .existsByDomainNameIgnoreCaseAndIdNot(
@@ -216,37 +245,48 @@ public class DomainService {
             );
         }
 
+        // -------------------------------------------------
+        // UPDATE DOMAIN NAME
+        // -------------------------------------------------
 
         current.setDomainName(
                 normalizedName
         );
 
+        // -------------------------------------------------
+        // UPDATE DESCRIPTION
+        // -------------------------------------------------
 
         current.setDescription(
                 newDomain.getDescription()
         );
 
+        normalizeDescription(
+                current
+        );
 
-        // ---------------------------------------------
-        // STATUS
-        // ---------------------------------------------
+        // -------------------------------------------------
+        // UPDATE STATUS
+        // -------------------------------------------------
 
         if (newDomain.getStatus() != null
                 && !newDomain
                         .getStatus()
                         .isBlank()) {
 
-            String status =
+            String normalizedStatus =
                     normalizeStatus(
                             newDomain.getStatus()
                     );
 
-
             /*
-             * DELETED phải đi qua chức năng soft delete.
-             * Không cho người dùng sửa form rồi chọn DELETED.
+             * DELETED phải thông qua soft delete.
+             *
+             * Không cho người dùng edit form
+             * và chuyển trực tiếp sang DELETED.
              */
-            if ("DELETED".equals(status)) {
+            if ("DELETED".equals(
+                    normalizedStatus)) {
 
                 throw new IllegalArgumentException(
                         "Hãy sử dụng chức năng xóa mềm "
@@ -254,27 +294,39 @@ public class DomainService {
                 );
             }
 
-
             current.setStatus(
-                    status
+                    normalizedStatus
             );
         }
 
+        // -------------------------------------------------
+        // TIMESTAMP
+        // -------------------------------------------------
 
-        normalizeDescription(
-                current
+        current.setUpdatedAt(
+                LocalDateTime.now()
         );
 
+        /*
+         * Domain ACTIVE / INACTIVE
+         * không phải domain đã xóa.
+         */
+        current.setDeletedAt(null);
 
-        return domainRepository.save(
+        // -------------------------------------------------
+        // SAVE
+        // -------------------------------------------------
+
+        return domainRepository.saveAndFlush(
                 current
         );
     }
 
-
-    // 
-    // DEACTIVATE DOMAIN
-    // 
+    // =====================================================
+    // 5. DEACTIVATE DOMAIN
+    //
+    // ACTIVE -> INACTIVE
+    // =====================================================
 
     @Transactional
     public Domain deactivateDomain(
@@ -283,8 +335,7 @@ public class DomainService {
         Domain domain =
                 getDomainById(id);
 
-
-        if ("DELETED".equals(
+        if ("DELETED".equalsIgnoreCase(
                 domain.getStatus())) {
 
             throw new IllegalStateException(
@@ -293,21 +344,24 @@ public class DomainService {
             );
         }
 
-
         domain.setStatus(
                 "INACTIVE"
         );
 
+        domain.setUpdatedAt(
+                LocalDateTime.now()
+        );
 
-        return domainRepository.save(
+        return domainRepository.saveAndFlush(
                 domain
         );
     }
 
-
-    // 
-    // ACTIVATE DOMAIN
-    // 
+    // =====================================================
+    // 6. ACTIVATE DOMAIN
+    //
+    // INACTIVE -> ACTIVE
+    // =====================================================
 
     @Transactional
     public Domain activateDomain(
@@ -316,8 +370,7 @@ public class DomainService {
         Domain domain =
                 getDomainById(id);
 
-
-        if ("DELETED".equals(
+        if ("DELETED".equalsIgnoreCase(
                 domain.getStatus())) {
 
             throw new IllegalStateException(
@@ -326,21 +379,28 @@ public class DomainService {
             );
         }
 
-
         domain.setStatus(
                 "ACTIVE"
         );
 
+        domain.setUpdatedAt(
+                LocalDateTime.now()
+        );
 
-        return domainRepository.save(
+        domain.setDeletedAt(null);
+
+        return domainRepository.saveAndFlush(
                 domain
         );
     }
 
-
-    // 
-    // SOFT DELETE DOMAIN
-    // 
+    // =====================================================
+    // 7. SOFT DELETE DOMAIN
+    //
+    // ACTIVE / INACTIVE
+    //        ↓
+    //     DELETED
+    // =====================================================
 
     @Transactional
     public Domain softDeleteDomain(
@@ -349,8 +409,7 @@ public class DomainService {
         Domain domain =
                 getDomainById(id);
 
-
-        if ("DELETED".equals(
+        if ("DELETED".equalsIgnoreCase(
                 domain.getStatus())) {
 
             throw new IllegalStateException(
@@ -358,26 +417,33 @@ public class DomainService {
             );
         }
 
+        LocalDateTime now =
+                LocalDateTime.now();
 
         domain.setStatus(
                 "DELETED"
         );
 
-
         domain.setDeletedAt(
-                LocalDateTime.now()
+                now
         );
 
+        domain.setUpdatedAt(
+                now
+        );
 
-        return domainRepository.save(
+        return domainRepository.saveAndFlush(
                 domain
         );
     }
 
-
-    // 
-    // HARD DELETE DOMAIN
-    // 
+    // =====================================================
+    // 8. HARD DELETE DOMAIN
+    //
+    // Chỉ Domain DELETED mới được xóa vật lý.
+    //
+    // Đồng thời Domain không được còn DNS Record.
+    // =====================================================
 
     @Transactional
     public void hardDeleteDomain(
@@ -386,12 +452,11 @@ public class DomainService {
         Domain domain =
                 getDomainById(id);
 
+        // -------------------------------------------------
+        // PHẢI SOFT DELETE TRƯỚC
+        // -------------------------------------------------
 
-        // ---------------------------------------------
-        // BẮT BUỘC SOFT DELETE TRƯỚC
-        // ---------------------------------------------
-
-        if (!"DELETED".equals(
+        if (!"DELETED".equalsIgnoreCase(
                 domain.getStatus())) {
 
             throw new IllegalStateException(
@@ -400,13 +465,13 @@ public class DomainService {
             );
         }
 
-
-        // ---------------------------------------------
+        // -------------------------------------------------
         // KIỂM TRA DNS RECORD
         //
-        // Kể cả record DELETED vẫn còn trong database,
-        // nên vẫn đang tham chiếu domain_id.
-        // ---------------------------------------------
+        // Kể cả DNS Record đã DELETED,
+        // nếu nó vẫn tồn tại trong database
+        // thì Foreign Key vẫn tham chiếu domain_id.
+        // -------------------------------------------------
 
         if (dnsRecordRepository
                 .existsByDomainId(id)) {
@@ -418,19 +483,20 @@ public class DomainService {
             );
         }
 
+        // -------------------------------------------------
+        // HARD DELETE
+        // -------------------------------------------------
 
         domainRepository.delete(
                 domain
         );
 
-
         domainRepository.flush();
     }
 
-
-    // 
-    // SEARCH + FILTER
-    // 
+    // =====================================================
+    // 9. SEARCH + FILTER DOMAIN
+    // =====================================================
 
     public List<Domain> filterDomains(
             String keyword,
@@ -440,11 +506,13 @@ public class DomainService {
                 keyword != null
                         && !keyword.isBlank();
 
-
         boolean hasStatus =
                 status != null
                         && !status.isBlank();
 
+        // -------------------------------------------------
+        // KEYWORD + STATUS
+        // -------------------------------------------------
 
         if (hasKeyword
                 && hasStatus) {
@@ -456,6 +524,9 @@ public class DomainService {
                     );
         }
 
+        // -------------------------------------------------
+        // KEYWORD ONLY
+        // -------------------------------------------------
 
         if (hasKeyword) {
 
@@ -465,6 +536,9 @@ public class DomainService {
                     );
         }
 
+        // -------------------------------------------------
+        // STATUS ONLY
+        // -------------------------------------------------
 
         if (hasStatus) {
 
@@ -474,14 +548,18 @@ public class DomainService {
                     );
         }
 
+        // -------------------------------------------------
+        // NO FILTER
+        // -------------------------------------------------
 
         return domainRepository.findAll();
     }
 
-
-    // 
-    // DASHBOARD
-    // 
+    // =====================================================
+    // 10. DASHBOARD - MANAGED DOMAINS
+    //
+    // ACTIVE + INACTIVE
+    // =====================================================
 
     public long countManagedDomains() {
 
@@ -491,6 +569,9 @@ public class DomainService {
                 );
     }
 
+    // =====================================================
+    // 11. DASHBOARD - ACTIVE
+    // =====================================================
 
     public long countActiveDomains() {
 
@@ -500,6 +581,9 @@ public class DomainService {
                 );
     }
 
+    // =====================================================
+    // 12. DASHBOARD - INACTIVE
+    // =====================================================
 
     public long countInactiveDomains() {
 
@@ -509,32 +593,25 @@ public class DomainService {
                 );
     }
 
-
-    // 
-    // NORMALIZE DOMAIN NAME
-    // 
-
-    private String normalizeDomainName(
-            String domainName) {
-
-        return domainName
-                .trim()
-                .toLowerCase();
-    }
-
-
-    // 
-    // NORMALIZE STATUS
-    // 
+    // =====================================================
+    // 13. NORMALIZE STATUS
+    // =====================================================
 
     private String normalizeStatus(
             String status) {
+
+        if (status == null
+                || status.isBlank()) {
+
+            throw new IllegalArgumentException(
+                    "Trạng thái tên miền không được để trống."
+            );
+        }
 
         String normalized =
                 status
                         .trim()
                         .toUpperCase();
-
 
         if (!normalized.equals("ACTIVE")
                 && !normalized.equals("INACTIVE")
@@ -546,29 +623,26 @@ public class DomainService {
             );
         }
 
-
         return normalized;
     }
 
-
-    // 
-    // NORMALIZE DESCRIPTION
-    // 
+    // =====================================================
+    // 14. NORMALIZE DESCRIPTION
+    // =====================================================
 
     private void normalizeDescription(
             Domain domain) {
 
-        if (domain.getDescription() == null) {
+        if (domain == null
+                || domain.getDescription() == null) {
 
             return;
         }
-
 
         String description =
                 domain
                         .getDescription()
                         .trim();
-
 
         if (description.isBlank()) {
 
@@ -583,5 +657,4 @@ public class DomainService {
             );
         }
     }
-
 }
