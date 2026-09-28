@@ -34,14 +34,14 @@ public class DnsRecordController {
         this.domainService = domainService;
     }
 
-    // =====================================================
+    
     // 1. DANH SÁCH DNS RECORD
     //
     // Hỗ trợ:
     // - chọn Domain
     // - tìm hostname / value
     // - lọc theo record type
-    // =====================================================
+    
 
     @GetMapping("/records") //nghĩa là method ngay bên dưới sẽ xử lý HTTP GET request tới /records.
     public String records(
@@ -60,10 +60,9 @@ public class DnsRecordController {
         return "records";
     }
 
-    // =====================================================
+   
     // 2. CREATE DNS RECORD
-    // =====================================================
-
+   
     @PostMapping("/records")
     public String createRecord(
             @RequestParam Long domainId,
@@ -120,9 +119,9 @@ public class DnsRecordController {
         }
     }
 //là gọi method loadRecordsPage() để nạp lại dữ liệu cần thiết cho trang DNS Record.
-    // =====================================================
+   
     // 3. XEM CHI TIẾT DNS RECORD
-    // =====================================================
+   
 
     @GetMapping("/records/{id}")
     public String recordDetail(
@@ -140,9 +139,9 @@ public class DnsRecordController {
         return "record-detail";
     }
 
-    // =====================================================
+   
     // 4. UPDATE DNS RECORD
-    // =====================================================
+   
 
     @PostMapping("/records/{id}/edit")
     public String updateRecord(
@@ -193,7 +192,6 @@ public class DnsRecordController {
         }
     }
 
-    // =====================================================
     // 5. SOFT DELETE DNS RECORD
     //
     // ACTIVE / INACTIVE
@@ -202,7 +200,7 @@ public class DnsRecordController {
     //
     // DnsRecordService hiện dùng:
     // deleteRecord(Long id)
-    // =====================================================
+    
 
     @PostMapping("/records/{id}/delete")
     public String softDeleteRecord(
@@ -263,11 +261,11 @@ public class DnsRecordController {
         }
     }
 
-    // =====================================================
+    
     // 6. HARD DELETE DNS RECORD
     //
     // Chỉ record DELETED mới được xóa vật lý.
-    // =====================================================
+    
 
     @PostMapping("/records/{id}/hard-delete")
     public String hardDeleteRecord(
@@ -325,9 +323,9 @@ public class DnsRecordController {
         }
     }
 
-    // =====================================================
+    
     // 7. HELPER - LOAD records.html
-    // =====================================================
+    
 
     private void loadRecordsPage(
             Long domainId,
@@ -335,10 +333,9 @@ public class DnsRecordController {
             String recordType,
             Model model) {
 
-        // -------------------------------------------------
+        
         // DNS RECORD LIST
-        // -------------------------------------------------
-
+       
         List<DnsRecord> records;
 
         /*
@@ -367,9 +364,9 @@ public class DnsRecordController {
                 records
         );
 
-        // -------------------------------------------------
+       
         // DOMAIN LIST
-        // -------------------------------------------------
+       
 
         List<Domain> domains =
                 domainService.getAllDomains();
@@ -379,9 +376,9 @@ public class DnsRecordController {
                 domains
         );
 
-        // -------------------------------------------------
+     
         // FILTER VALUES
-        // -------------------------------------------------
+        
 
         model.addAttribute(
                 "domainId",
@@ -398,9 +395,9 @@ public class DnsRecordController {
                 recordType
         );
 
-        // -------------------------------------------------
+        
         // CURRENT DOMAIN
-        // -------------------------------------------------
+      
 
         if (domainId != null) {
 
@@ -415,9 +412,9 @@ public class DnsRecordController {
             );
         }
 
-        // -------------------------------------------------
+      
         // FORM OBJECT
-        // -------------------------------------------------
+       
 
         /*
          * Khi create validation fail,
@@ -434,7 +431,7 @@ public class DnsRecordController {
         }
     }
 
-    // =====================================================
+    
     // 8. HELPER - BUILD FQDN DISPLAY
     //
     // @ + example.vn
@@ -442,7 +439,7 @@ public class DnsRecordController {
     //
     // www + example.vn
     // -> www.example.vn
-    // =====================================================
+   
 
     private String buildDisplayName(
             DnsRecord record) {

@@ -14,9 +14,9 @@ public class DnsRecordHistoryService {
 
     private final DnsRecordHistoryRepository historyRepository;
 
-    // =====================================================
+   
     // CONSTRUCTOR
-    // =====================================================
+   
 
     public DnsRecordHistoryService(
             DnsRecordHistoryRepository historyRepository) {
@@ -24,9 +24,9 @@ public class DnsRecordHistoryService {
         this.historyRepository = historyRepository;
     }
 
-    // =====================================================
+    
     // 1. SEARCH HISTORY
-    // =====================================================
+   
 
     public List<DnsRecordHistory> searchHistory(
             Long domainId,
@@ -46,13 +46,13 @@ public class DnsRecordHistoryService {
         );
     }
 
-    // =====================================================
+    
     // 2. LOG CREATE
     //
     // CREATE:
     // before = null
     // after  = record mới
-    // =====================================================
+   
 
     public void logCreate(DnsRecord record) {
 
@@ -73,13 +73,13 @@ public class DnsRecordHistoryService {
         historyRepository.save(history);
     }
 
-    // =====================================================
+   
     // 3. LOG UPDATE
     //
     // UPDATE:
     // before = trạng thái cũ
     // after  = trạng thái mới
-    // =====================================================
+    
 
     public void logUpdate(
             DnsRecord before,
@@ -108,13 +108,13 @@ public class DnsRecordHistoryService {
         historyRepository.save(history);
     }
 
-    // =====================================================
+   
     // 4. LOG DELETE
     //
     // DELETE:
     // before = trạng thái trước khi xóa mềm
     // after  = trạng thái DELETED
-    // =====================================================
+    
 
     public void logDelete(
             DnsRecord before,
@@ -143,12 +143,11 @@ public class DnsRecordHistoryService {
         historyRepository.save(history);
     }
 
-    // =====================================================
+   
     // 5. BASE HISTORY
     //
     // Các field dùng chung cho CREATE / UPDATE / DELETE
-    // =====================================================
-
+   
     private DnsRecordHistory baseHistory(
             DnsRecord record,
             String actionType,
@@ -197,9 +196,9 @@ public class DnsRecordHistoryService {
         return history;
     }
 
-    // =====================================================
+   
     // 6. SET BEFORE SNAPSHOT
-    // =====================================================
+   
 
     private void setBefore(
             DnsRecordHistory history,
@@ -232,9 +231,9 @@ public class DnsRecordHistoryService {
         );
     }
 
-    // =====================================================
+    
     // 7. SET AFTER SNAPSHOT
-    // =====================================================
+    
 
     private void setAfter(
             DnsRecordHistory history,
@@ -267,13 +266,12 @@ public class DnsRecordHistoryService {
         );
     }
 
-    // =====================================================
+   
     // 8. COUNT RECENT CHANGES
     //
     // Dashboard:
     // số thay đổi trong 7 ngày gần nhất
-    // =====================================================
-
+    
     public long countRecentChanges() {
 
         LocalDateTime sevenDaysAgo =
@@ -286,9 +284,9 @@ public class DnsRecordHistoryService {
                 );
     }
 
-    // =====================================================
+  
     // 9. NORMALIZE ACTION TYPE
-    // =====================================================
+    
 
     private String normalizeActionType(
             String actionType) {
@@ -304,9 +302,9 @@ public class DnsRecordHistoryService {
                 .toUpperCase();
     }
 
-    // =====================================================
+    
     // 10. VALIDATE RECORD
-    // =====================================================
+   
 
     private void validateRecord(
             DnsRecord record) {
